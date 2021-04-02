@@ -90,6 +90,26 @@ const osThreadAttr_t Motor3PWM_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityBelowNormal4,
 };
+/* Definitions for Motor1PIDUpdate */
+osTimerId_t Motor1PIDUpdateHandle;
+const osTimerAttr_t Motor1PIDUpdate_attributes = {
+  .name = "Motor1PIDUpdate"
+};
+/* Definitions for Motor2PIDUpdate */
+osTimerId_t Motor2PIDUpdateHandle;
+const osTimerAttr_t Motor2PIDUpdate_attributes = {
+  .name = "Motor2PIDUpdate"
+};
+/* Definitions for Motor3PIDUpdate */
+osTimerId_t Motor3PIDUpdateHandle;
+const osTimerAttr_t Motor3PIDUpdate_attributes = {
+  .name = "Motor3PIDUpdate"
+};
+/* Definitions for DriveTrainPID */
+osTimerId_t DriveTrainPIDHandle;
+const osTimerAttr_t DriveTrainPID_attributes = {
+  .name = "DriveTrainPID"
+};
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -111,6 +131,10 @@ void StartDefaultTask(void *argument);
 void StartMotor1PWM(void *argument);
 void StartMotor2PWM(void *argument);
 void StartMotor3PWM(void *argument);
+void RunMotor1PIDUpdate(void *argument);
+void RunMotor2PIDUpdate(void *argument);
+void RunMotor3PIDUpdate(void *argument);
+void RunDriveTrainPID(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -173,6 +197,19 @@ int main(void)
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
+
+  /* Create the timer(s) */
+  /* creation of Motor1PIDUpdate */
+  Motor1PIDUpdateHandle = osTimerNew(RunMotor1PIDUpdate, osTimerPeriodic, NULL, &Motor1PIDUpdate_attributes);
+
+  /* creation of Motor2PIDUpdate */
+  Motor2PIDUpdateHandle = osTimerNew(RunMotor2PIDUpdate, osTimerPeriodic, NULL, &Motor2PIDUpdate_attributes);
+
+  /* creation of Motor3PIDUpdate */
+  Motor3PIDUpdateHandle = osTimerNew(RunMotor3PIDUpdate, osTimerPeriodic, NULL, &Motor3PIDUpdate_attributes);
+
+  /* creation of DriveTrainPID */
+  DriveTrainPIDHandle = osTimerNew(RunDriveTrainPID, osTimerPeriodic, NULL, &DriveTrainPID_attributes);
 
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
@@ -912,6 +949,38 @@ void StartMotor3PWM(void *argument)
     osDelay(1);
   }
   /* USER CODE END StartMotor3PWM */
+}
+
+/* RunMotor1PIDUpdate function */
+void RunMotor1PIDUpdate(void *argument)
+{
+  /* USER CODE BEGIN RunMotor1PIDUpdate */
+
+  /* USER CODE END RunMotor1PIDUpdate */
+}
+
+/* RunMotor2PIDUpdate function */
+void RunMotor2PIDUpdate(void *argument)
+{
+  /* USER CODE BEGIN RunMotor2PIDUpdate */
+
+  /* USER CODE END RunMotor2PIDUpdate */
+}
+
+/* RunMotor3PIDUpdate function */
+void RunMotor3PIDUpdate(void *argument)
+{
+  /* USER CODE BEGIN RunMotor3PIDUpdate */
+
+  /* USER CODE END RunMotor3PIDUpdate */
+}
+
+/* RunDriveTrainPID function */
+void RunDriveTrainPID(void *argument)
+{
+  /* USER CODE BEGIN RunDriveTrainPID */
+
+  /* USER CODE END RunDriveTrainPID */
 }
 
 /**
