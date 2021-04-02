@@ -69,6 +69,27 @@ const osThreadAttr_t defaultTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for Motor1PWM */
+osThreadId_t Motor1PWMHandle;
+const osThreadAttr_t Motor1PWM_attributes = {
+  .name = "Motor1PWM",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal4,
+};
+/* Definitions for Motor2PWM */
+osThreadId_t Motor2PWMHandle;
+const osThreadAttr_t Motor2PWM_attributes = {
+  .name = "Motor2PWM",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal4,
+};
+/* Definitions for Motor3PWM */
+osThreadId_t Motor3PWMHandle;
+const osThreadAttr_t Motor3PWM_attributes = {
+  .name = "Motor3PWM",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityBelowNormal4,
+};
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -87,6 +108,9 @@ static void MX_SDIO_SD_Init(void);
 static void MX_UART10_Init(void);
 static void MX_USART6_UART_Init(void);
 void StartDefaultTask(void *argument);
+void StartMotor1PWM(void *argument);
+void StartMotor2PWM(void *argument);
+void StartMotor3PWM(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -161,6 +185,15 @@ int main(void)
   /* Create the thread(s) */
   /* creation of defaultTask */
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+
+  /* creation of Motor1PWM */
+  Motor1PWMHandle = osThreadNew(StartMotor1PWM, NULL, &Motor1PWM_attributes);
+
+  /* creation of Motor2PWM */
+  Motor2PWMHandle = osThreadNew(StartMotor2PWM, NULL, &Motor2PWM_attributes);
+
+  /* creation of Motor3PWM */
+  Motor3PWMHandle = osThreadNew(StartMotor3PWM, NULL, &Motor3PWM_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -825,6 +858,60 @@ void StartDefaultTask(void *argument)
     osDelay(1);
   }
   /* USER CODE END 5 */
+}
+
+/* USER CODE BEGIN Header_StartMotor1PWM */
+/**
+* @brief Function implementing the Motor1PWM thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartMotor1PWM */
+void StartMotor1PWM(void *argument)
+{
+  /* USER CODE BEGIN StartMotor1PWM */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartMotor1PWM */
+}
+
+/* USER CODE BEGIN Header_StartMotor2PWM */
+/**
+* @brief Function implementing the Motor2PWM thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartMotor2PWM */
+void StartMotor2PWM(void *argument)
+{
+  /* USER CODE BEGIN StartMotor2PWM */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartMotor2PWM */
+}
+
+/* USER CODE BEGIN Header_StartMotor3PWM */
+/**
+* @brief Function implementing the Motor3PWM thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartMotor3PWM */
+void StartMotor3PWM(void *argument)
+{
+  /* USER CODE BEGIN StartMotor3PWM */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartMotor3PWM */
 }
 
 /**
