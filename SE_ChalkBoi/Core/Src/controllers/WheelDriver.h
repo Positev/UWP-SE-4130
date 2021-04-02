@@ -15,8 +15,8 @@ class WheelDriver
 
 private:
 
-    DCMotorController motor;
-    RoteryEncoderMonitor encoder;
+    DCMotorController *motor;
+    RoteryEncoderMonitor *encoder;
     PIDDRIVER pid;
 
     
@@ -29,7 +29,8 @@ private:
 
 public:
 
-	WheelDriver( DCMotorController motor, RoteryEncoderMonitor encoder );
+	WheelDriver( DCMotorController *motor, RoteryEncoderMonitor *encoder );
+
 
     void setTargetVelocity();
     void spinForDisatance();

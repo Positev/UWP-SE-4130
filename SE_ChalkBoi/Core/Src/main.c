@@ -21,6 +21,7 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "usb_host.h"
+#include "ChalkBoi.cpp"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -109,6 +110,11 @@ const osTimerAttr_t Motor3PIDUpdate_attributes = {
 osTimerId_t DriveTrainPIDHandle;
 const osTimerAttr_t DriveTrainPID_attributes = {
   .name = "DriveTrainPID"
+};
+/* Definitions for myEvent01 */
+osEventFlagsId_t myEvent01Handle;
+const osEventFlagsAttr_t myEvent01_attributes = {
+  .name = "myEvent01"
 };
 /* USER CODE BEGIN PV */
 
@@ -235,6 +241,10 @@ int main(void)
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
+
+  /* Create the event(s) */
+  /* creation of myEvent01 */
+  myEvent01Handle = osEventFlagsNew(&myEvent01_attributes);
 
   /* USER CODE BEGIN RTOS_EVENTS */
   /* add events, ... */
@@ -702,12 +712,11 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOF, Motor1PWM_Pin|Motor2PWM_Pin|Motor1Dir2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, Motor3Dir2_Pin|GPIO_PIN_13|Motor1Enc2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, Motor3Dir2_Pin|GPIO_PIN_13, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, Motor3PWM_Pin|D15_Pin|Motor3Enc2_Pin|Motor3Enc1_Pin
-                          |GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15|Motor2Enc2_Pin
-                          |Motor2Enc1_Pin|Motor2Dir1_Pin|Motor1Enc1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, Motor3PWM_Pin|D15_Pin|GPIO_PIN_13|GPIO_PIN_14
+                          |GPIO_PIN_15|Motor2Dir1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOG, GPIO_PIN_8|Motor1Dir1_Pin, GPIO_PIN_RESET);
@@ -739,38 +748,38 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PA0 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0;
+  /*Configure GPIO pins : PA0 Motor1Enc2_Pin */
+  GPIO_InitStruct.Pin = GPIO_PIN_0|Motor1Enc2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : Motor3Dir2_Pin PA13 Motor1Enc2_Pin */
-  GPIO_InitStruct.Pin = Motor3Dir2_Pin|GPIO_PIN_13|Motor1Enc2_Pin;
+  /*Configure GPIO pins : Motor3Dir2_Pin PA13 */
+  GPIO_InitStruct.Pin = Motor3Dir2_Pin|GPIO_PIN_13;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : Motor3PWM_Pin D15_Pin Motor3Enc2_Pin Motor3Enc1_Pin
-                           PB13 PB14 PB15 Motor2Enc2_Pin
-                           Motor2Enc1_Pin Motor2Dir1_Pin Motor1Enc1_Pin */
-  GPIO_InitStruct.Pin = Motor3PWM_Pin|D15_Pin|Motor3Enc2_Pin|Motor3Enc1_Pin
-                          |GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15|Motor2Enc2_Pin
-                          |Motor2Enc1_Pin|Motor2Dir1_Pin|Motor1Enc1_Pin;
+  /*Configure GPIO pins : Motor3PWM_Pin D15_Pin PB13 PB14
+                           PB15 Motor2Dir1_Pin */
+  GPIO_InitStruct.Pin = Motor3PWM_Pin|D15_Pin|GPIO_PIN_13|GPIO_PIN_14
+                          |GPIO_PIN_15|Motor2Dir1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PF11 */
-  GPIO_InitStruct.Pin = GPIO_PIN_11;
+  /*Configure GPIO pins : Motor3Enc2_Pin Motor3Enc1_Pin Motor2Enc2_Pin Motor2Enc1_Pin
+                           Motor1Enc1_Pin */
+  GPIO_InitStruct.Pin = Motor3Enc2_Pin|Motor3Enc1_Pin|Motor2Enc2_Pin|Motor2Enc1_Pin
+                          |Motor1Enc1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PG7 PG15 */
-  GPIO_InitStruct.Pin = GPIO_PIN_7|GPIO_PIN_15;
+  /*Configure GPIO pin : PG7 */
+  GPIO_InitStruct.Pin = GPIO_PIN_7;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
@@ -781,6 +790,22 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI1_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI1_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI4_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI4_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 }
 
@@ -910,7 +935,7 @@ void StartMotor1PWM(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    ChalkBoi.getInstance().pwmPulse(1);
   }
   /* USER CODE END StartMotor1PWM */
 }
@@ -928,7 +953,7 @@ void StartMotor2PWM(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    ChalkBoi.getInstance().pwmPulse(2);
   }
   /* USER CODE END StartMotor2PWM */
 }
@@ -946,7 +971,7 @@ void StartMotor3PWM(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    ChalkBoi.getInstance().pwmPulse(3);
   }
   /* USER CODE END StartMotor3PWM */
 }
@@ -981,6 +1006,27 @@ void RunDriveTrainPID(void *argument)
   /* USER CODE BEGIN RunDriveTrainPID */
 
   /* USER CODE END RunDriveTrainPID */
+}
+
+ /**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM6 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM6) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
 }
 
 /**

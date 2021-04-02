@@ -20,8 +20,14 @@ class DCMotorController
 private:
 
 	//---Board implementation specific--------------------
-	int port;
-	int pin;
+	int pwmPort;
+	int pwmPin;
+
+	int dir1Pin;
+	int dir1Port;
+	
+	int dir2Pin; 
+	int dir2Port;
 	//---Board implementation specific--------------------
 
 
@@ -38,7 +44,7 @@ public:
 	 * IN - PORT is the port used to identify the signal pin that is driven high and low for pwm
 	 * IN - PIN is the pin used to identify the signal pin that is driven high and low for pwm
 	 */
-	DCMotorController(int port, int pin);
+	DCMotorController(int port, int pin, int dir1Port, int dir1Pin, int dir2Port, int dir2Pin);
 
 	/*
 	 * IN - POWER should be a range limited float between 0 and 1

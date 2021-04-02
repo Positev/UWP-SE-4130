@@ -16,16 +16,16 @@ class DriveTrainController
 
 private:
 
-    WheelDriver wheelA;
-    WheelDriver wheelB;
-    WheelDriver wheelC;
+    WheelDriver *wheelA;
+    WheelDriver *wheelB;
+    WheelDriver *wheelC;
 
     PIDDRIVER pid;
 
 
 public:
 
-	DriveTrainController(WheelDriver wheelA, WheelDriver wheelB, WheelDriver wheelC);
+	DriveTrainController(WheelDriver *wheelA, WheelDriver *wheelB, WheelDriver *wheelC);
 
     void handleTimerEvent();
     void move(float vx, float vy, float distance);

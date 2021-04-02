@@ -20,7 +20,7 @@ private:
 	//---Board implementation specific--------------------
 	int signalAPort;
 	int signalAPin;
-    int signalBPort;
+  int signalBPort;
 	int signalBPin;
 	//---Board implementation specific--------------------
 
@@ -28,8 +28,8 @@ private:
 	//---Motor parameters for desired behavior-----------
 
 	int tickCount; // negative number implies reverse direction. No range limit. 
-    int lastReadingA; // 1 or 0 - high or low
-    int lastReadingB; // 1 or 0 - high or low
+  int lastReadingA; // 1 or 0 - high or low
+  int lastReadingB; // 1 or 0 - high or low
 	//---Motor parameters for desired behavior-----------
 
 public:
@@ -40,8 +40,7 @@ public:
 	 */
 	RoteryEncoderMonitor(int portA, int pinA, int portB, int pinB );
 
-	void handleChangeOnA();
-    void handleChangeOnB();
+	void handleChange(int channel, int newValue){};
 
     // retrieve count
     int getCount();
@@ -51,10 +50,6 @@ public:
 
 
 };
-
-
-#endif /* SRC_CONTROLLERS_DCMOTORCONTROLLER_H_ */
-
 
 
 #endif /* SRC_CONTROLLERS_ROTERYENCODERMONITOR_H_ */

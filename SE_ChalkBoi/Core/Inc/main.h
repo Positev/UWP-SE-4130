@@ -156,8 +156,10 @@ void Error_Handler(void);
 #define D15_GPIO_Port GPIOB
 #define Motor3Enc2_Pin GPIO_PIN_11
 #define Motor3Enc2_GPIO_Port GPIOB
+#define Motor3Enc2_EXTI_IRQn EXTI15_10_IRQn
 #define Motor3Enc1_Pin GPIO_PIN_12
 #define Motor3Enc1_GPIO_Port GPIOB
+#define Motor3Enc1_EXTI_IRQn EXTI15_10_IRQn
 #define LCD_PSRAM_D13_Pin GPIO_PIN_8
 #define LCD_PSRAM_D13_GPIO_Port GPIOD
 #define LCD_PSRAM_D14_Pin GPIO_PIN_9
@@ -206,6 +208,7 @@ void Error_Handler(void);
 #define STLINK_JTMS_SWCLK_GPIO_Port GPIOA
 #define Motor1Enc2_Pin GPIO_PIN_15
 #define Motor1Enc2_GPIO_Port GPIOA
+#define Motor1Enc2_EXTI_IRQn EXTI15_10_IRQn
 #define SD_D2_Pin GPIO_PIN_10
 #define SD_D2_GPIO_Port GPIOC
 #define SD_D3_Pin GPIO_PIN_11
@@ -244,14 +247,17 @@ void Error_Handler(void);
 #define STLINK_JTDO_SWCLK_GPIO_Port GPIOB
 #define Motor2Enc2_Pin GPIO_PIN_4
 #define Motor2Enc2_GPIO_Port GPIOB
+#define Motor2Enc2_EXTI_IRQn EXTI4_IRQn
 #define Motor2Enc1_Pin GPIO_PIN_5
 #define Motor2Enc1_GPIO_Port GPIOB
+#define Motor2Enc1_EXTI_IRQn EXTI9_5_IRQn
 #define Motor2Dir1_Pin GPIO_PIN_6
 #define Motor2Dir1_GPIO_Port GPIOB
 #define DFSDM2_DATIN7_Pin GPIO_PIN_7
 #define DFSDM2_DATIN7_GPIO_Port GPIOB
 #define Motor1Enc1_Pin GPIO_PIN_8
 #define Motor1Enc1_GPIO_Port GPIOB
+#define Motor1Enc1_EXTI_IRQn EXTI9_5_IRQn
 #define CODEC_WS_Pin GPIO_PIN_9
 #define CODEC_WS_GPIO_Port GPIOB
 #define PSRAM_NBL0_Pin GPIO_PIN_0
