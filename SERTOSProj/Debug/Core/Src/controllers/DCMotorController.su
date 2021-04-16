@@ -1,5 +1,0 @@
-DCMotorController.cpp:4:1:DCMotorController::DCMotorController(GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t)	24	static
-DCMotorController.cpp:17:6:void DCMotorController::setPower(float)	16	static
-DCMotorController.cpp:30:6:void DCMotorController::pwmPulse()	24	static
-DCMotorController.cpp:39:6:void DCMotorController::setDirection(DCMotorController::MotorDirection)	16	static
-DCMotorController.cpp:50:6:void DCMotorController::stop()	16	static

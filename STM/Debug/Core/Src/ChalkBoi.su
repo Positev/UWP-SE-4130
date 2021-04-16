@@ -1,4 +1,0 @@
-ChalkBoi.cpp:16:12:static ChalkBoi& ChalkBoi::getInstance()	8	static
-ChalkBoi.cpp:23:7:void ChalkBoi::pwmPulse(int)	16	static
-ChalkBoi.cpp:34:7:void ChalkBoi::encoderTick(int, int, int)	24	static
-ChalkBoi.cpp:47:2:ChalkBoi::ChalkBoi()	16	static

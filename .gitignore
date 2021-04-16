@@ -1,5 +1,9 @@
 
 .metadata/*
 ChalkBoi/Debug
+ChalkBoi/bin
 ChalkBoi/Drivers
 ChalkBoi/Middlewares
+devenv/*
+
+

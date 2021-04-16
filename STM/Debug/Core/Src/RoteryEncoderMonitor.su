@@ -1,4 +1,0 @@
-RoteryEncoderMonitor.cpp:3:1:RoteryEncoderMonitor::RoteryEncoderMonitor(GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t)	24	static
-RoteryEncoderMonitor.cpp:12:6:void RoteryEncoderMonitor::handleChange()	24	static
-RoteryEncoderMonitor.cpp:37:5:int RoteryEncoderMonitor::getCount()	16	static
-RoteryEncoderMonitor.cpp:41:6:void RoteryEncoderMonitor::reset()	16	static
