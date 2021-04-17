@@ -1,0 +1,10 @@
+{
+  "files.associations": {
+    "*.pl": "prolog",
+    "drivetraincontroller.h": "c",
+    "piddriver.h": "c",
+    "wheeldriver.h": "c",
+    "roteryencodermonitor.h": "c",
+    "dcmotorcontroller.h": "c"
+  }
+}

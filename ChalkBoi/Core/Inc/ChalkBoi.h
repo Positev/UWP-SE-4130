@@ -22,7 +22,7 @@ public:
 
 	void pwmPulse(int motor);
 
-	void encoderTick(int wheel, int channel, int value);
+	void encoderTick();
 
 private:
 

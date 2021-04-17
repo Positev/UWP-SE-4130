@@ -12,6 +12,7 @@
 #include "WheelDriver.h"
 #include "DriveTrainController.h"
 #include "ChalkBoi.h"
+#include "string.h"
 
 	ChalkBoi& ChalkBoi::getInstance() {
 
@@ -31,31 +32,34 @@
 			return motor3->pwmPulse();
 		}
 	}
-	void ChalkBoi::encoderTick(int wheel, int channel, int value){/*
-			if (wheel == 1){
-				return encoder1->handleChange(channel, value);
-			}
-			else if (wheel == 2){
-				return encoder2->handleChange(channel, value);
-			}
-			else if (wheel == 3){
-				return encoder3->handleChange(channel, value);
-			}*/
+	void ChalkBoi::encoderTick(){
+		
+		encoder1->handleChange();
+		encoder2->handleChange();
+		encoder3->handleChange();
 	}
 
 
-	ChalkBoi::ChalkBoi(){/*
-		motor1 = new DCMotorController(Motor1PWM_GPIO_Port, Motor1PWM_Pin, Motor1Dir1_GPIO_Port, Motor1Dir1_Pin,Motor1Dir2_GPIO_Port, Motor1Dir2_Pin);
-		motor2 = new DCMotorController(Motor2PWM_GPIO_Port, Motor2PWM_Pin, Motor2Dir1_GPIO_Port, Motor2Dir1_Pin,Motor2Dir2_GPIO_Port, Motor2Dir2_Pin);
-		motor3 = new DCMotorController(Motor3PWM_GPIO_Port, Motor3PWM_Pin, Motor3Dir1_GPIO_Port, Motor3Dir1_Pin,Motor3Dir2_GPIO_Port, Motor3Dir2_Pin);
+	//TODO delete these pointers in the destructor to avoid memory leak
 
-		encoder1 = new RoteryEncoderMonitor(Motor1Enc1_GPIO_Port,Motor1Enc1_Pin,Motor1Enc2_GPIO_Port,Motor1Enc2_Pin);
-		encoder2 = new RoteryEncoderMonitor(Motor2Enc1_GPIO_Port,Motor2Enc1_Pin,Motor2Enc2_GPIO_Port,Motor2Enc2_Pin);
-		encoder3 = new RoteryEncoderMonitor(Motor3Enc1_GPIO_Port, Motor3Enc1_Pin,Motor3Enc2_GPIO_Port,Motor3Enc2_Pin);
+	ChalkBoi::ChalkBoi(){
+		motor1 = new DCMotorController(M1_PWM_GPIO_Port, M1_PWM_Pin, M1_DIR_1_GPIO_Port, M1_DIR_1_Pin,M1_DIR_2_GPIO_Port, M1_DIR_2_Pin);
+		motor2 = new DCMotorController(M2_PWM_GPIO_Port, M2_PWM_Pin, M2_DIR_1_GPIO_Port, M2_DIR_1_Pin,M2_DIR_2_GPIO_Port, M2_DIR_2_Pin);
+		motor3 = new DCMotorController(M3_PWM_GPIO_Port, M3_PWM_Pin, M3_DIR_1_GPIO_Port, M3_DIR_1_Pin,M3_DIR_2_GPIO_Port, M3_DIR_2_Pin);
 
-		wheel1 = new WheelDriver(motor1, encoder1);
-		wheel2 = new WheelDriver(motor2, encoder2);
-		wheel3 = new WheelDriver(motor3, encoder3);
-		driveBase = new DriveTrainController(wheel1, wheel2, wheel3);*/
+		motor1->setPower(.125);
+		motor2->setPower(.125);
+		motor3->setPower(.125);
+		motor1->setDirection(DCMotorController::Clockwise);
+		motor2->setDirection(DCMotorController::Clockwise);
+		motor3->setDirection(DCMotorController::Clockwise);
+		encoder1 = new RoteryEncoderMonitor(M1_ENC_1_GPIO_Port, M1_ENC_1_Pin,M1_ENC_2_GPIO_Port,M1_ENC_2_Pin);
+		encoder2 = new RoteryEncoderMonitor(M2_ENC_1_GPIO_Port, M2_ENC_1_Pin,M2_ENC_2_GPIO_Port,M2_ENC_2_Pin);
+		encoder3 = new RoteryEncoderMonitor(M3_ENC_1_GPIO_Port, M3_ENC_1_Pin,M3_ENC_2_GPIO_Port,M3_ENC_2_Pin);
+
+		//wheel1 = new WheelDriver(motor1, encoder1);
+		//wheel2 = new WheelDriver(motor2, encoder2);
+		//wheel3 = new WheelDriver(motor3, encoder3);
+		//driveBase = new DriveTrainController(wheel1, wheel2, wheel3);
 
 }

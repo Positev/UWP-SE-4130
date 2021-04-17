@@ -19,7 +19,10 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "cmsis_os.h"
+#include "ChalkBoi.h"
 #include "usb_host.h"
+#include "string.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -43,8 +46,6 @@
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
 
-DAC_HandleTypeDef hdac;
-
 DFSDM_Channel_HandleTypeDef hdfsdm1_channel1;
 DFSDM_Channel_HandleTypeDef hdfsdm2_channel1;
 DFSDM_Channel_HandleTypeDef hdfsdm2_channel7;
@@ -63,6 +64,49 @@ UART_HandleTypeDef huart6;
 SRAM_HandleTypeDef hsram1;
 SRAM_HandleTypeDef hsram2;
 
+/* Definitions for defaultTask */
+osThreadId_t defaultTaskHandle;
+const osThreadAttr_t defaultTask_attributes = {
+  .name = "defaultTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for Motor_1_PWM_Dri */
+osThreadId_t Motor_1_PWM_DriHandle;
+const osThreadAttr_t Motor_1_PWM_Dri_attributes = {
+  .name = "Motor_1_PWM_Dri",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityAboveNormal4,
+};
+/* Definitions for Motor_2_PWM_Dri */
+osThreadId_t Motor_2_PWM_DriHandle;
+const osThreadAttr_t Motor_2_PWM_Dri_attributes = {
+  .name = "Motor_2_PWM_Dri",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityAboveNormal4,
+};
+/* Definitions for Motor_3_PWM_Dri */
+osThreadId_t Motor_3_PWM_DriHandle;
+const osThreadAttr_t Motor_3_PWM_Dri_attributes = {
+  .name = "Motor_3_PWM_Dri",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityAboveNormal4,
+};
+/* Definitions for Motor_1_Velocity_Watch */
+osTimerId_t Motor_1_Velocity_WatchHandle;
+const osTimerAttr_t Motor_1_Velocity_Watch_attributes = {
+  .name = "Motor_1_Velocity_Watch"
+};
+/* Definitions for Motor_2_Velocity_Watch */
+osTimerId_t Motor_2_Velocity_WatchHandle;
+const osTimerAttr_t Motor_2_Velocity_Watch_attributes = {
+  .name = "Motor_2_Velocity_Watch"
+};
+/* Definitions for Motor_3_Velocity_Watch */
+osTimerId_t Motor_3_Velocity_WatchHandle;
+const osTimerAttr_t Motor_3_Velocity_Watch_attributes = {
+  .name = "Motor_3_Velocity_Watch"
+};
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -71,7 +115,6 @@ SRAM_HandleTypeDef hsram2;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_ADC1_Init(void);
-static void MX_DAC_Init(void);
 static void MX_DFSDM1_Init(void);
 static void MX_DFSDM2_Init(void);
 static void MX_FMPI2C1_Init(void);
@@ -81,7 +124,13 @@ static void MX_QUADSPI_Init(void);
 static void MX_SDIO_SD_Init(void);
 static void MX_UART10_Init(void);
 static void MX_USART6_UART_Init(void);
-void MX_USB_HOST_Process(void);
+void StartDefaultTask(void *argument);
+void Start_Motor_1_PWM(void *argument);
+void Start_Motor_2_PWM(void *argument);
+void Start_Motor_3_PWM(void *argument);
+void Check_Motor_1_Velocity(void *argument);
+void Check_Motor_2_Velocity(void *argument);
+void Check_Motor_3_Velocity(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -120,7 +169,6 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_ADC1_Init();
-  MX_DAC_Init();
   MX_DFSDM1_Init();
   MX_DFSDM2_Init();
   MX_FMPI2C1_Init();
@@ -129,21 +177,70 @@ int main(void)
   MX_QUADSPI_Init();
  // MX_SDIO_SD_Init();
   MX_UART10_Init();
-  
   MX_USART6_UART_Init();
-  MX_USB_HOST_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
+  /* Init scheduler */
+  osKernelInitialize();
+
+  /* USER CODE BEGIN RTOS_MUTEX */
+  /* add mutexes, ... */
+  /* USER CODE END RTOS_MUTEX */
+
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* add semaphores, ... */
+  /* USER CODE END RTOS_SEMAPHORES */
+
+  /* Create the timer(s) */
+  /* creation of Motor_1_Velocity_Watch */
+  Motor_1_Velocity_WatchHandle = osTimerNew(Check_Motor_1_Velocity, osTimerPeriodic, NULL, &Motor_1_Velocity_Watch_attributes);
+
+  /* creation of Motor_2_Velocity_Watch */
+  Motor_2_Velocity_WatchHandle = osTimerNew(Check_Motor_2_Velocity, osTimerPeriodic, NULL, &Motor_2_Velocity_Watch_attributes);
+
+  /* creation of Motor_3_Velocity_Watch */
+  Motor_3_Velocity_WatchHandle = osTimerNew(Check_Motor_3_Velocity, osTimerPeriodic, NULL, &Motor_3_Velocity_Watch_attributes);
+
+  /* USER CODE BEGIN RTOS_TIMERS */
+  /* start timers, add new ones, ... */
+  /* USER CODE END RTOS_TIMERS */
+
+  /* USER CODE BEGIN RTOS_QUEUES */
+  /* add queues, ... */
+  /* USER CODE END RTOS_QUEUES */
+
+  /* Create the thread(s) */
+  /* creation of defaultTask */
+  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+
+  /* creation of Motor_1_PWM_Dri */
+  Motor_1_PWM_DriHandle = osThreadNew(Start_Motor_1_PWM, NULL, &Motor_1_PWM_Dri_attributes);
+
+  /* creation of Motor_2_PWM_Dri */
+  Motor_2_PWM_DriHandle = osThreadNew(Start_Motor_2_PWM, NULL, &Motor_2_PWM_Dri_attributes);
+
+  /* creation of Motor_3_PWM_Dri */
+  Motor_3_PWM_DriHandle = osThreadNew(Start_Motor_3_PWM, NULL, &Motor_3_PWM_Dri_attributes);
+
+  /* USER CODE BEGIN RTOS_THREADS */
+  /* add threads, ... */
+  /* USER CODE END RTOS_THREADS */
+
+  /* USER CODE BEGIN RTOS_EVENTS */
+  /* add events, ... */
+  /* USER CODE END RTOS_EVENTS */
+
+  /* Start scheduler */
+  osKernelStart();
+
+  /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
-    MX_USB_HOST_Process();
-    HAL_GPIO_TogglePin(LED2_GREEN_GPIO_Port, LED2_GREEN_Pin);
-    HAL_Delay(100);
 
     /* USER CODE BEGIN 3 */
   }
@@ -261,44 +358,6 @@ static void MX_ADC1_Init(void)
   /* USER CODE BEGIN ADC1_Init 2 */
 
   /* USER CODE END ADC1_Init 2 */
-
-}
-
-/**
-  * @brief DAC Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_DAC_Init(void)
-{
-
-  /* USER CODE BEGIN DAC_Init 0 */
-
-  /* USER CODE END DAC_Init 0 */
-
-  DAC_ChannelConfTypeDef sConfig = {0};
-
-  /* USER CODE BEGIN DAC_Init 1 */
-
-  /* USER CODE END DAC_Init 1 */
-  /** DAC Initialization
-  */
-  hdac.Instance = DAC;
-  if (HAL_DAC_Init(&hdac) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** DAC channel OUT1 config
-  */
-  sConfig.DAC_Trigger = DAC_TRIGGER_NONE;
-  sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
-  if (HAL_DAC_ConfigChannel(&hdac, &sConfig, DAC_CHANNEL_1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN DAC_Init 2 */
-
-  /* USER CODE END DAC_Init 2 */
 
 }
 
@@ -626,39 +685,44 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, LED1_RED_Pin|MEMS_LED_Pin|LCD_BL_CTRL_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOE, LED1_RED_Pin|MEMS_LED_Pin|LCD_BL_CTRL_Pin|M2_DIR_2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LED2_GREEN_GPIO_Port, LED2_GREEN_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, M3_DIR_1_Pin|LED2_GREEN_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, LCD_CTP_RST_Pin|LCD_TE_Pin|WIFI_WKUP_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOF, M1_PWM_Pin|M2_PWM_Pin|M1_DIR_2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOG, USB_OTG_FS_PWR_EN_Pin|ARD_D2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(M3_DIR_2_GPIO_Port, M3_DIR_2_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : LED1_RED_Pin MEMS_LED_Pin LCD_BL_CTRL_Pin */
-  GPIO_InitStruct.Pin = LED1_RED_Pin|MEMS_LED_Pin|LCD_BL_CTRL_Pin;
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, M3_PWM_Pin|LCD_CTP_RST_Pin|LCD_TE_Pin|WIFI_WKUP_Pin
+                          |M2_DIR_1_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOG, USB_OTG_FS_PWR_EN_Pin|M1_DIR_1_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : LED1_RED_Pin MEMS_LED_Pin LCD_BL_CTRL_Pin M2_DIR_2_Pin */
+  GPIO_InitStruct.Pin = LED1_RED_Pin|MEMS_LED_Pin|LCD_BL_CTRL_Pin|M2_DIR_2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : ARD_D5_Pin */
-  GPIO_InitStruct.Pin = ARD_D5_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  /*Configure GPIO pins : M3_DIR_1_Pin LED2_GREEN_Pin */
+  GPIO_InitStruct.Pin = M3_DIR_1_Pin|LED2_GREEN_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF3_TIM9;
-  HAL_GPIO_Init(ARD_D5_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : ARD_D3_Pin */
-  GPIO_InitStruct.Pin = ARD_D3_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  /*Configure GPIO pins : M1_PWM_Pin M2_PWM_Pin M1_DIR_2_Pin */
+  GPIO_InitStruct.Pin = M1_PWM_Pin|M2_PWM_Pin|M1_DIR_2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF2_TIM5;
-  HAL_GPIO_Init(ARD_D3_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
   /*Configure GPIO pin : CTP_INT_Pin */
   GPIO_InitStruct.Pin = CTP_INT_Pin;
@@ -666,98 +730,66 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(CTP_INT_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : B_USER_Pin */
-  GPIO_InitStruct.Pin = B_USER_Pin;
+  /*Configure GPIO pins : B_USER_Pin M1_ENC_2_Pin */
+  GPIO_InitStruct.Pin = B_USER_Pin|M1_ENC_2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(B_USER_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : LED2_GREEN_Pin */
-  GPIO_InitStruct.Pin = LED2_GREEN_Pin;
+  /*Configure GPIO pin : M3_DIR_2_Pin */
+  GPIO_InitStruct.Pin = M3_DIR_2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LED2_GREEN_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(M3_DIR_2_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : ARD_D6_Pin */
-  GPIO_InitStruct.Pin = ARD_D6_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  /*Configure GPIO pins : M3_PWM_Pin LCD_CTP_RST_Pin LCD_TE_Pin WIFI_WKUP_Pin
+                           M2_DIR_1_Pin */
+  GPIO_InitStruct.Pin = M3_PWM_Pin|LCD_CTP_RST_Pin|LCD_TE_Pin|WIFI_WKUP_Pin
+                          |M2_DIR_1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF2_TIM3;
-  HAL_GPIO_Init(ARD_D6_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : SD_Detect_Pin */
-  GPIO_InitStruct.Pin = SD_Detect_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(SD_Detect_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : ARD_D15_Pin ARD_D14_Pin */
-  GPIO_InitStruct.Pin = ARD_D15_Pin|ARD_D14_Pin;
+  /*Configure GPIO pin : ARD_D15_Pin */
+  GPIO_InitStruct.Pin = ARD_D15_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   GPIO_InitStruct.Alternate = GPIO_AF4_I2C2;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_Init(ARD_D15_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : ARD_D13_Pin */
-  GPIO_InitStruct.Pin = ARD_D13_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-  GPIO_InitStruct.Alternate = GPIO_AF7_SPI3;
-  HAL_GPIO_Init(ARD_D13_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : LCD_CTP_RST_Pin LCD_TE_Pin WIFI_WKUP_Pin */
-  GPIO_InitStruct.Pin = LCD_CTP_RST_Pin|LCD_TE_Pin|WIFI_WKUP_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : USB_OTG_FS_OVRCR_Pin CODEC_INT_Pin */
-  GPIO_InitStruct.Pin = USB_OTG_FS_OVRCR_Pin|CODEC_INT_Pin;
+  /*Configure GPIO pins : M3_ENC_2_Pin M3_ENC_1_Pin M2_ENC_2_Pin M2_ENC_1_Pin
+                           M1_ENC_1_Pin */
+  GPIO_InitStruct.Pin = M3_ENC_2_Pin|M3_ENC_1_Pin|M2_ENC_2_Pin|M2_ENC_1_Pin
+                          |M1_ENC_1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : USB_OTG_FS_PWR_EN_Pin ARD_D2_Pin */
-  GPIO_InitStruct.Pin = USB_OTG_FS_PWR_EN_Pin|ARD_D2_Pin;
+  /*Configure GPIO pin : USB_OTG_FS_OVRCR_Pin */
+  GPIO_InitStruct.Pin = USB_OTG_FS_OVRCR_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(USB_OTG_FS_OVRCR_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : USB_OTG_FS_PWR_EN_Pin M1_DIR_1_Pin */
+  GPIO_InitStruct.Pin = USB_OTG_FS_PWR_EN_Pin|M1_DIR_1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : ARD_D10_Pin */
-  GPIO_InitStruct.Pin = ARD_D10_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF1_TIM2;
-  HAL_GPIO_Init(ARD_D10_GPIO_Port, &GPIO_InitStruct);
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI4_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI4_IRQn);
 
-  /*Configure GPIO pins : ARD_D12_Pin ARD_D11_Pin */
-  GPIO_InitStruct.Pin = ARD_D12_Pin|ARD_D11_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-  GPIO_InitStruct.Alternate = GPIO_AF6_SPI3;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
-  /*Configure GPIO pin : ARD_D4_Pin */
-  GPIO_InitStruct.Pin = ARD_D4_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(ARD_D4_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : ARD_D9_Pin */
-  GPIO_InitStruct.Pin = ARD_D9_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF2_TIM4;
-  HAL_GPIO_Init(ARD_D9_GPIO_Port, &GPIO_InitStruct);
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 }
 
@@ -851,8 +883,127 @@ static void MX_FSMC_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HandleEncoderUpdate(){
+  char* data = "ENCODER UPDATE\n";
+  
+  HAL_UART_Transmit(&huart6, (uint8_t * ) data, strlen(data), 10);
+}
 /* USER CODE END 4 */
+
+/* USER CODE BEGIN Header_StartDefaultTask */
+/**
+  * @brief  Function implementing the defaultTask thread.
+  * @param  argument: Not used
+  * @retval None
+  */
+/* USER CODE END Header_StartDefaultTask */
+void StartDefaultTask(void *argument)
+{
+  /* init code for USB_HOST */
+  MX_USB_HOST_Init();
+  /* USER CODE BEGIN 5 */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END 5 */
+}
+
+/* USER CODE BEGIN Header_Start_Motor_1_PWM */
+/**
+* @brief Function implementing the Motor_1_PWM_Dri thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Start_Motor_1_PWM */
+void Start_Motor_1_PWM(void *argument)
+{
+  /* USER CODE BEGIN Start_Motor_1_PWM */
+  /* Infinite loop */
+  for(;;)
+  {
+    ChalkBoi::getInstance().pwmPulse(1);
+  }
+  /* USER CODE END Start_Motor_1_PWM */
+}
+
+/* USER CODE BEGIN Header_Start_Motor_2_PWM */
+/**
+* @brief Function implementing the Motor_2_PWM_Dri thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Start_Motor_2_PWM */
+void Start_Motor_2_PWM(void *argument)
+{
+  /* USER CODE BEGIN Start_Motor_2_PWM */
+  /* Infinite loop */
+  for(;;)
+  {
+    
+    ChalkBoi::getInstance().pwmPulse(2);
+    //chalkey->pwmPulse(1);
+  }
+  /* USER CODE END Start_Motor_2_PWM */
+}
+
+void Start_Motor_3_PWM(void *argument)
+{
+  /* USER CODE BEGIN Start_Motor_3_PWM */
+  /* Infinite loop */
+  for(;;)
+  {
+    
+    ChalkBoi::getInstance().pwmPulse(3);
+    //chalkey->pwmPulse(1);
+  }
+  /* USER CODE END Start_Motor_3_PWM */
+}
+
+/* Check_Motor_1_Velocity function */
+void Check_Motor_1_Velocity(void *argument)
+{
+  /* USER CODE BEGIN Check_Motor_1_Velocity */
+  /* USER CODE END Check_Motor_1_Velocity */
+}
+
+/* Check_Motor_2_Velocity function */
+void Check_Motor_2_Velocity(void *argument)
+{
+  /* USER CODE BEGIN Check_Motor_2_Velocity */
+
+  /* USER CODE END Check_Motor_2_Velocity */
+}
+
+/* Check_Motor_3_Velocity function */
+void Check_Motor_3_Velocity(void *argument)
+{
+  /* USER CODE BEGIN Check_Motor_3_Velocity */
+
+  /* USER CODE END Check_Motor_3_Velocity */
+}
+
+ /**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM6 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM6) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.

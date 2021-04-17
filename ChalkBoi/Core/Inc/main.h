@@ -54,7 +54,7 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+void HandleEncoderUpdate();
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
@@ -66,8 +66,10 @@ void Error_Handler(void);
 #define MEMS_LED_GPIO_Port GPIOE
 #define LCD_BL_CTRL_Pin GPIO_PIN_5
 #define LCD_BL_CTRL_GPIO_Port GPIOE
-#define ARD_D5_Pin GPIO_PIN_6
-#define ARD_D5_GPIO_Port GPIOE
+#define M2_DIR_2_Pin GPIO_PIN_6
+#define M2_DIR_2_GPIO_Port GPIOE
+#define M3_DIR_1_Pin GPIO_PIN_13
+#define M3_DIR_1_GPIO_Port GPIOC
 #define OSC32_IN_Pin GPIO_PIN_14
 #define OSC32_IN_GPIO_Port GPIOC
 #define OSC32_OUT_Pin GPIO_PIN_15
@@ -84,16 +86,16 @@ void Error_Handler(void);
 #define PSRAM_A4_GPIO_Port GPIOF
 #define PSRAM_A5_Pin GPIO_PIN_5
 #define PSRAM_A5_GPIO_Port GPIOF
-#define ARD_D0_Pin GPIO_PIN_6
-#define ARD_D0_GPIO_Port GPIOF
-#define ARD_D1_Pin GPIO_PIN_7
-#define ARD_D1_GPIO_Port GPIOF
+#define M1_PWM_Pin GPIO_PIN_6
+#define M1_PWM_GPIO_Port GPIOF
+#define M2_PWM_Pin GPIO_PIN_7
+#define M2_PWM_GPIO_Port GPIOF
 #define QSPI_BK1_IO0_Pin GPIO_PIN_8
 #define QSPI_BK1_IO0_GPIO_Port GPIOF
 #define QSPI_BK1_IO1_Pin GPIO_PIN_9
 #define QSPI_BK1_IO1_GPIO_Port GPIOF
-#define ARD_D3_Pin GPIO_PIN_10
-#define ARD_D3_GPIO_Port GPIOF
+#define M1_DIR_2_Pin GPIO_PIN_10
+#define M1_DIR_2_GPIO_Port GPIOF
 #define STLK_MCO_Pin GPIO_PIN_0
 #define STLK_MCO_GPIO_Port GPIOH
 #define WIFI_RST_Pin GPIO_PIN_1
@@ -114,8 +116,8 @@ void Error_Handler(void);
 #define ARD_A2_GPIO_Port GPIOA
 #define CODEC_MCK_Pin GPIO_PIN_3
 #define CODEC_MCK_GPIO_Port GPIOA
-#define ARD_D8_Pin GPIO_PIN_4
-#define ARD_D8_GPIO_Port GPIOA
+#define M3_DIR_2_Pin GPIO_PIN_4
+#define M3_DIR_2_GPIO_Port GPIOA
 #define ARD_A3_Pin GPIO_PIN_5
 #define ARD_A3_GPIO_Port GPIOA
 #define SD_CMD_Pin GPIO_PIN_6
@@ -126,14 +128,12 @@ void Error_Handler(void);
 #define ARD_A5_GPIO_Port GPIOC
 #define LED2_GREEN_Pin GPIO_PIN_5
 #define LED2_GREEN_GPIO_Port GPIOC
-#define ARD_D6_Pin GPIO_PIN_0
-#define ARD_D6_GPIO_Port GPIOB
+#define M3_PWM_Pin GPIO_PIN_0
+#define M3_PWM_GPIO_Port GPIOB
 #define ARD_A4_Pin GPIO_PIN_1
 #define ARD_A4_GPIO_Port GPIOB
 #define QSPI_CLK_Pin GPIO_PIN_2
 #define QSPI_CLK_GPIO_Port GPIOB
-#define SD_Detect_Pin GPIO_PIN_11
-#define SD_Detect_GPIO_Port GPIOF
 #define PSRAM_A6_Pin GPIO_PIN_12
 #define PSRAM_A6_GPIO_Port GPIOF
 #define PSRAM_A7_Pin GPIO_PIN_13
@@ -166,10 +166,12 @@ void Error_Handler(void);
 #define LCD_PSRAM_D12_GPIO_Port GPIOE
 #define ARD_D15_Pin GPIO_PIN_10
 #define ARD_D15_GPIO_Port GPIOB
-#define ARD_D14_Pin GPIO_PIN_11
-#define ARD_D14_GPIO_Port GPIOB
-#define ARD_D13_Pin GPIO_PIN_12
-#define ARD_D13_GPIO_Port GPIOB
+#define M3_ENC_2_Pin GPIO_PIN_11
+#define M3_ENC_2_GPIO_Port GPIOB
+#define M3_ENC_2_EXTI_IRQn EXTI15_10_IRQn
+#define M3_ENC_1_Pin GPIO_PIN_12
+#define M3_ENC_1_GPIO_Port GPIOB
+#define M3_ENC_1_EXTI_IRQn EXTI15_10_IRQn
 #define LCD_CTP_RST_Pin GPIO_PIN_13
 #define LCD_CTP_RST_GPIO_Port GPIOB
 #define LCD_TE_Pin GPIO_PIN_14
@@ -204,6 +206,7 @@ void Error_Handler(void);
 #define QSPI_BK1_NCS_GPIO_Port GPIOG
 #define USB_OTG_FS_OVRCR_Pin GPIO_PIN_7
 #define USB_OTG_FS_OVRCR_GPIO_Port GPIOG
+#define USB_OTG_FS_OVRCR_EXTI_IRQn EXTI9_5_IRQn
 #define USB_OTG_FS_PWR_EN_Pin GPIO_PIN_8
 #define USB_OTG_FS_PWR_EN_GPIO_Port GPIOG
 #define I2CFMP1_SCL_Pin GPIO_PIN_6
@@ -228,8 +231,9 @@ void Error_Handler(void);
 #define STLINK_JTMS_SWDIO_GPIO_Port GPIOA
 #define STLINK_JTMS_SWCLK_Pin GPIO_PIN_14
 #define STLINK_JTMS_SWCLK_GPIO_Port GPIOA
-#define ARD_D10_Pin GPIO_PIN_15
-#define ARD_D10_GPIO_Port GPIOA
+#define M1_ENC_2_Pin GPIO_PIN_15
+#define M1_ENC_2_GPIO_Port GPIOA
+#define M1_ENC_2_EXTI_IRQn EXTI15_10_IRQn
 #define SD_D2_Pin GPIO_PIN_10
 #define SD_D2_GPIO_Port GPIOC
 #define SD_D3_Pin GPIO_PIN_11
@@ -260,24 +264,25 @@ void Error_Handler(void);
 #define WIFI_SPI_CSN_GPIO_Port GPIOG
 #define WIFI_DRDY_Pin GPIO_PIN_12
 #define WIFI_DRDY_GPIO_Port GPIOG
-#define ARD_D2_Pin GPIO_PIN_13
-#define ARD_D2_GPIO_Port GPIOG
+#define M1_DIR_1_Pin GPIO_PIN_13
+#define M1_DIR_1_GPIO_Port GPIOG
 #define VCP_TX_Pin GPIO_PIN_14
 #define VCP_TX_GPIO_Port GPIOG
-#define CODEC_INT_Pin GPIO_PIN_15
-#define CODEC_INT_GPIO_Port GPIOG
 #define STLINK_JTDO_SWCLK_Pin GPIO_PIN_3
 #define STLINK_JTDO_SWCLK_GPIO_Port GPIOB
-#define ARD_D12_Pin GPIO_PIN_4
-#define ARD_D12_GPIO_Port GPIOB
-#define ARD_D11_Pin GPIO_PIN_5
-#define ARD_D11_GPIO_Port GPIOB
-#define ARD_D4_Pin GPIO_PIN_6
-#define ARD_D4_GPIO_Port GPIOB
+#define M2_ENC_2_Pin GPIO_PIN_4
+#define M2_ENC_2_GPIO_Port GPIOB
+#define M2_ENC_2_EXTI_IRQn EXTI4_IRQn
+#define M2_ENC_1_Pin GPIO_PIN_5
+#define M2_ENC_1_GPIO_Port GPIOB
+#define M2_ENC_1_EXTI_IRQn EXTI9_5_IRQn
+#define M2_DIR_1_Pin GPIO_PIN_6
+#define M2_DIR_1_GPIO_Port GPIOB
 #define DFSDM2_DATIN7_Pin GPIO_PIN_7
 #define DFSDM2_DATIN7_GPIO_Port GPIOB
-#define ARD_D9_Pin GPIO_PIN_8
-#define ARD_D9_GPIO_Port GPIOB
+#define M1_ENC_1_Pin GPIO_PIN_8
+#define M1_ENC_1_GPIO_Port GPIOB
+#define M1_ENC_1_EXTI_IRQn EXTI9_5_IRQn
 #define CODEC_WS_Pin GPIO_PIN_9
 #define CODEC_WS_GPIO_Port GPIOB
 #define PSRAM_NBL0_Pin GPIO_PIN_0

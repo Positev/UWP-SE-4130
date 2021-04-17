@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CLionExternalBuildManager">
+    <target id="421f377b-601f-4ff0-8645-3bef9e615932" name="Unnamed" defaultType="MAKE">
+      <configuration id="d5595545-9bdd-4492-a5ce-23aac010a5a1" name="Unnamed" toolchainName="Visual Studio" />
+    </target>
+    <target id="443aab2a-99ee-4647-b1e5-379fe2b9d034" name="Unnamed (1)" defaultType="MAKE">
+      <configuration id="8d294761-3d94-4f7d-aa08-afc5f22dfb9b" name="Unnamed (1)">
+        <build type="MAKE">
+          <make targetName="make" />
+        </build>
+        <clean type="MAKE">
+          <make targetName="make clean" />
+        </clean>
+      </configuration>
+    </target>
+  </component>
+</project>

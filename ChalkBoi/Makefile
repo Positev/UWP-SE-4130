@@ -49,8 +49,6 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dac.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dac_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dfsdm.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_fmpi2c.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_fmpi2c_ex.c \
@@ -69,23 +67,89 @@ Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_core.c \
 Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_ctlreq.c \
 Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_ioreq.c \
 Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c \
-Middlewares/ST/STM32_USB_Host_Library/Class/CDC/Src/usbh_cdc.c
+Middlewares/ST/STM32_USB_Host_Library/Class/CDC/Src/usbh_cdc.c \
+Core/Src/freertos.c \
+Core/Src/stm32f4xx_hal_timebase_tim.c \
+Middlewares/Third_Party/FreeRTOS/Source/croutine.c \
+Middlewares/Third_Party/FreeRTOS/Source/event_groups.c \
+Middlewares/Third_Party/FreeRTOS/Source/list.c \
+Middlewares/Third_Party/FreeRTOS/Source/queue.c \
+Middlewares/Third_Party/FreeRTOS/Source/stream_buffer.c \
+Middlewares/Third_Party/FreeRTOS/Source/tasks.c \
+Middlewares/Third_Party/FreeRTOS/Source/timers.c \
+Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c \
+Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c \
+Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c \
 
 
 CXXSOURCES= \
-Core/Src/main.cpp 
+Core/Src/main.cpp \
+Core/Src/ChalkBoi.cpp \
+Core/Src/DCMotorController.cpp \
+Core/Src/RoteryEncoderMonitor.cpp 
 
 # Find header directories
 INCLUDES= \
--IUSB_HOST/App \
--IUSB_HOST/Target \
--ICore/Inc \
--IDrivers/STM32F4xx_HAL_Driver/Inc \
--IDrivers/STM32F4xx_HAL_Driver/Inc/Legacy \
--IMiddlewares/ST/STM32_USB_Host_Library/Core/Inc \
--IMiddlewares/ST/STM32_USB_Host_Library/Class/CDC/Inc \
--IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
--IDrivers/CMSIS/Include
+-IDrivers/CMSIS/Include   \
+-IMiddlewares/ST/STM32_USB_Host_Library/Core/Inc   \
+-IMiddlewares/Third_Party/FreeRTOS/Source/include   \
+-IDrivers/STM32F4xx_HAL_Driver/Inc/Legacy   \
+-IDrivers/CMSIS/DSP/DSP_Lib_TestSuite/Common/inc/filtering_tests   \
+-IDrivers/CMSIS/NN/NN_Lib_Tests/nn_test/RTE/_ARMCM0   \
+-IDrivers/CMSIS/DSP/DSP_Lib_TestSuite/Common/JTest/inc/opt_arg   \
+-IDrivers/CMSIS/NN/NN_Lib_Tests/nn_test   \
+-IDrivers/CMSIS/RTOS2/Template   \
+-IDrivers/CMSIS/NN/NN_Lib_Tests/nn_test/Ref_Implementations   \
+-IDrivers/CMSIS/NN/NN_Lib_Tests/nn_test/RTE/_ARMCM7_SP   \
+-IMiddlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2   \
+-IDrivers/CMSIS/DSP/DSP_Lib_TestSuite/Common/inc   \
+-IDrivers/CMSIS/DSP/Examples/ARM/arm_signal_converge_example   \
+-IDrivers/CMSIS/NN/Examples/ARM/arm_nn_examples/cifar10   \
+-IDrivers/CMSIS/NN/Examples/ARM/arm_nn_examples/gru/RTE/Compiler   \
+-IUSB_HOST/App   \
+-IDrivers/CMSIS/NN/Examples/ARM/arm_nn_examples/gru/RTE/_ARMCM3   \
+-IDrivers/CMSIS/NN/Examples/ARM/arm_nn_examples/cifar10/RTE/Compiler   \
+-IDrivers/CMSIS/DSP/Examples/ARM/arm_linear_interp_example   \
+-IDrivers/CMSIS/NN/Examples/ARM/arm_nn_examples/cifar10/RTE/_ARMCM4_FP   \
+-ICore/Inc   \
+-IDrivers/CMSIS/NN/Examples/ARM/arm_nn_examples/cifar10/RTE/_ARMCM7_SP   \
+-IDrivers/CMSIS/RTOS2/Include   \
+-IDrivers/CMSIS/RTOS/Template   \
+-IDrivers/CMSIS/NN/Examples/ARM/arm_nn_examples/cifar10/RTE/_ARMCM3   \
+-IDrivers/CMSIS/DSP/DSP_Lib_TestSuite/Common/inc/support_tests   \
+-IDrivers/CMSIS/NN/Examples/ARM/arm_nn_examples/gru/RTE/_ARMCM4_FP   \
+-IMiddlewares/ST/STM32_USB_Host_Library/Class/CDC/Inc   \
+-IDrivers/STM32F4xx_HAL_Driver/Inc   \
+-IDrivers/CMSIS/DSP/DSP_Lib_TestSuite/Common/inc/fast_math_tests   \
+-IDrivers/CMSIS/NN/NN_Lib_Tests/nn_test/RTE/_ARMCM3   \
+-IDrivers/CMSIS/NN/NN_Lib_Tests/nn_test/RTE/_ARMCM4_FP   \
+-IDrivers/CMSIS/NN/Examples/ARM/arm_nn_examples/gru   \
+-IDrivers/CMSIS/DSP/DSP_Lib_TestSuite/Common/JTest/inc   \
+-IDrivers/CMSIS/DSP/DSP_Lib_TestSuite/Common/inc/transform_tests   \
+-IMiddlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F   \
+-IDrivers/CMSIS/DSP/Examples/ARM/arm_graphic_equalizer_example   \
+-IDrivers/CMSIS/Core/Include   \
+-IDrivers/CMSIS/DSP/Examples/ARM/arm_convolution_example   \
+-IDrivers/CMSIS/DSP/Include   \
+-IDrivers/CMSIS/DSP/DSP_Lib_TestSuite/RefLibs/inc   \
+-IDrivers/CMSIS/DSP/DSP_Lib_TestSuite/Common/inc/statistics_tests   \
+-IDrivers/CMSIS/DSP/DSP_Lib_TestSuite/Common/inc/controller_tests   \
+-IDrivers/CMSIS/NN/Examples/ARM/arm_nn_examples/gru/RTE/_ARMCM0   \
+-IDrivers/CMSIS/DSP/DSP_Lib_TestSuite/Common/inc/basic_math_tests   \
+-IDrivers/CMSIS/NN/Include   \
+-IDrivers/CMSIS/DSP/DSP_Lib_TestSuite/Common/inc/matrix_tests   \
+-IDrivers/CMSIS/DSP/DSP_Lib_TestSuite/Common/inc/templates   \
+-IDrivers/CMSIS/DSP/DSP_Lib_TestSuite/Common/JTest/inc/util   \
+-IDrivers/CMSIS/DSP/DSP_Lib_TestSuite/Common/JTest/inc/arr_desc   \
+-IDrivers/CMSIS/DSP/Examples/ARM/arm_matrix_example   \
+-IDrivers/CMSIS/DSP/Examples/ARM/arm_fir_example   \
+-IDrivers/CMSIS/NN/Examples/ARM/arm_nn_examples/cifar10/RTE/_ARMCM0   \
+-IDrivers/CMSIS/DSP/DSP_Lib_TestSuite/Common/inc/intrinsics_tests   \
+-IDrivers/CMSIS/NN/Examples/ARM/arm_nn_examples/gru/RTE/_ARMCM7_SP   \
+-IUSB_HOST/Target   \
+-IDrivers/CMSIS/DSP/DSP_Lib_TestSuite/Common/inc/complex_math_tests   \
+-IDrivers/CMSIS/Core_A/Include   \
+-IDrivers/CMSIS/Device/ST/STM32F4xx/Include
 
 # Find libraries
 INCLUDES_LIBS= -lc -lm -lnosys
@@ -111,7 +175,7 @@ DEFS=-DUSE_HAL_DRIVER -DSTM32F413xx
 CFLAGS=-c -g $(MCFLAGS) $(DEFS) $(INCLUDES)
 CXXFLAGS=-c -g $(MCFLAGS) $(DEFS) $(INCLUDES) -std=c++11
 # LINKER FLAGS
-LDSCRIPT=STM32F413ZHTx_FLASH.ld
+LDSCRIPT = STM32F413ZHTx_FLASH.ld
 LDFLAGS =-T $(LDSCRIPT) $(MCFLAGS)  $(INCLUDES_LIBS) $(LINK_LIBS)
 
 ###

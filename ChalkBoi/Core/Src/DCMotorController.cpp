@@ -30,10 +30,10 @@ void DCMotorController::setPower(float power){
 void DCMotorController::pwmPulse(){
   float power = this->power;
   HAL_GPIO_WritePin(this->pwmPort, this->pwmPin, GPIO_PIN_SET) ;
-  osDelay(this->frequency * power);
+  HAL_Delay(this->frequency * power);
   
   HAL_GPIO_WritePin(this->pwmPort, this->pwmPin, GPIO_PIN_RESET) ;
-  osDelay(this->frequency * (1 - power));
+  HAL_Delay(this->frequency * (1 - power));
   }
 
 void DCMotorController::setDirection(MotorDirection direction){
