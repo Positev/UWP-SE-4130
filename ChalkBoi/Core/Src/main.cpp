@@ -68,43 +68,46 @@ SRAM_HandleTypeDef hsram2;
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
-    .name = "defaultTask",
-    .stack_size = 128 * 4,
-    .priority = (osPriority_t)osPriorityAboveNormal4,
+  .name = "defaultTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityAboveNormal,
 };
 /* Definitions for Motor_1_PWM_Dri */
 osThreadId_t Motor_1_PWM_DriHandle;
 const osThreadAttr_t Motor_1_PWM_Dri_attributes = {
-    .name = "Motor_1_PWM_Dri",
-    .stack_size = 128 * 4,
-    .priority = (osPriority_t)osPriorityAboveNormal4,
+  .name = "Motor_1_PWM_Dri",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for Motor_2_PWM_Dri */
 osThreadId_t Motor_2_PWM_DriHandle;
 const osThreadAttr_t Motor_2_PWM_Dri_attributes = {
-    .name = "Motor_2_PWM_Dri",
-    .stack_size = 128 * 4,
-    .priority = (osPriority_t)osPriorityAboveNormal4,
+  .name = "Motor_2_PWM_Dri",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for Motor_3_PWM_Dri */
 osThreadId_t Motor_3_PWM_DriHandle;
 const osThreadAttr_t Motor_3_PWM_Dri_attributes = {
-    .name = "Motor_3_PWM_Dri",
-    .stack_size = 128 * 4,
-    .priority = (osPriority_t)osPriorityAboveNormal4,
+  .name = "Motor_3_PWM_Dri",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for Motor_1_Velocity_Watch */
 osTimerId_t Motor_1_Velocity_WatchHandle;
 const osTimerAttr_t Motor_1_Velocity_Watch_attributes = {
-    .name = "Motor_1_Velocity_Watch"};
+  .name = "Motor_1_Velocity_Watch"
+};
 /* Definitions for Motor_2_Velocity_Watch */
 osTimerId_t Motor_2_Velocity_WatchHandle;
 const osTimerAttr_t Motor_2_Velocity_Watch_attributes = {
-    .name = "Motor_2_Velocity_Watch"};
+  .name = "Motor_2_Velocity_Watch"
+};
 /* Definitions for Motor_3_Velocity_Watch */
 osTimerId_t Motor_3_Velocity_WatchHandle;
 const osTimerAttr_t Motor_3_Velocity_Watch_attributes = {
-    .name = "Motor_3_Velocity_Watch"};
+  .name = "Motor_3_Velocity_Watch"
+};
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -130,6 +133,7 @@ void Check_Motor_1_Velocity(void *argument);
 void Check_Motor_2_Velocity(void *argument);
 void Check_Motor_3_Velocity(void *argument);
 
+static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -173,9 +177,12 @@ int main(void)
   MX_FSMC_Init();
   MX_I2S2_Init();
   MX_QUADSPI_Init();
-  // MX_SDIO_SD_Init();
+  //MX_SDIO_SD_Init();
   MX_UART10_Init();
   MX_USART6_UART_Init();
+
+  /* Initialize interrupts */
+  MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -262,7 +269,7 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI | RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
@@ -279,7 +286,8 @@ void SystemClock_Config(void)
   }
   /** Initializes the CPU, AHB and APB buses clocks
   */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
@@ -289,7 +297,9 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_I2S_APB1 | RCC_PERIPHCLK_DFSDM1 | RCC_PERIPHCLK_SDIO | RCC_PERIPHCLK_CLK48 | RCC_PERIPHCLK_FMPI2C1;
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_I2S_APB1|RCC_PERIPHCLK_DFSDM1
+                              |RCC_PERIPHCLK_SDIO|RCC_PERIPHCLK_CLK48
+                              |RCC_PERIPHCLK_FMPI2C1;
   PeriphClkInitStruct.PLLI2S.PLLI2SN = 50;
   PeriphClkInitStruct.PLLI2S.PLLI2SM = 12;
   PeriphClkInitStruct.PLLI2S.PLLI2SR = 2;
@@ -304,6 +314,17 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief NVIC Configuration.
+  * @retval None
+  */
+static void MX_NVIC_Init(void)
+{
+  /* EXTI0_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 }
 
 /**
@@ -353,6 +374,7 @@ static void MX_ADC1_Init(void)
   /* USER CODE BEGIN ADC1_Init 2 */
 
   /* USER CODE END ADC1_Init 2 */
+
 }
 
 /**
@@ -390,6 +412,7 @@ static void MX_DFSDM1_Init(void)
   /* USER CODE BEGIN DFSDM1_Init 2 */
 
   /* USER CODE END DFSDM1_Init 2 */
+
 }
 
 /**
@@ -444,6 +467,7 @@ static void MX_DFSDM2_Init(void)
   /* USER CODE BEGIN DFSDM2_Init 2 */
 
   /* USER CODE END DFSDM2_Init 2 */
+
 }
 
 /**
@@ -483,6 +507,7 @@ static void MX_FMPI2C1_Init(void)
   /* USER CODE BEGIN FMPI2C1_Init 2 */
 
   /* USER CODE END FMPI2C1_Init 2 */
+
 }
 
 /**
@@ -516,6 +541,7 @@ static void MX_I2S2_Init(void)
   /* USER CODE BEGIN I2S2_Init 2 */
 
   /* USER CODE END I2S2_Init 2 */
+
 }
 
 /**
@@ -550,6 +576,7 @@ static void MX_QUADSPI_Init(void)
   /* USER CODE BEGIN QUADSPI_Init 2 */
 
   /* USER CODE END QUADSPI_Init 2 */
+
 }
 
 /**
@@ -585,6 +612,7 @@ static void MX_SDIO_SD_Init(void)
   /* USER CODE BEGIN SDIO_Init 2 */
 
   /* USER CODE END SDIO_Init 2 */
+
 }
 
 /**
@@ -617,6 +645,7 @@ static void MX_UART10_Init(void)
   /* USER CODE BEGIN UART10_Init 2 */
 
   /* USER CODE END UART10_Init 2 */
+
 }
 
 /**
@@ -649,6 +678,7 @@ static void MX_USART6_UART_Init(void)
   /* USER CODE BEGIN USART6_Init 2 */
 
   /* USER CODE END USART6_Init 2 */
+
 }
 
 /**
@@ -671,39 +701,40 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, LED1_RED_Pin | MEMS_LED_Pin | LCD_BL_CTRL_Pin | M2_DIR_2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOE, LED1_RED_Pin|MEMS_LED_Pin|LCD_BL_CTRL_Pin|M2_DIR_2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, M3_DIR_1_Pin | LED2_GREEN_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, M3_DIR_1_Pin|LED2_GREEN_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOF, M1_PWM_Pin | M2_PWM_Pin | M1_DIR_2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOF, M1_PWM_Pin|M2_PWM_Pin|M1_DIR_2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(M3_DIR_2_GPIO_Port, M3_DIR_2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, M3_PWM_Pin | LCD_CTP_RST_Pin | LCD_TE_Pin | WIFI_WKUP_Pin | M2_DIR_1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, M3_PWM_Pin|LCD_CTP_RST_Pin|LCD_TE_Pin|WIFI_WKUP_Pin
+                          |M2_DIR_1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOG, USB_OTG_FS_PWR_EN_Pin | M1_DIR_1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOG, USB_OTG_FS_PWR_EN_Pin|M1_DIR_1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : LED1_RED_Pin MEMS_LED_Pin LCD_BL_CTRL_Pin M2_DIR_2_Pin */
-  GPIO_InitStruct.Pin = LED1_RED_Pin | MEMS_LED_Pin | LCD_BL_CTRL_Pin | M2_DIR_2_Pin;
+  GPIO_InitStruct.Pin = LED1_RED_Pin|MEMS_LED_Pin|LCD_BL_CTRL_Pin|M2_DIR_2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
   /*Configure GPIO pins : M3_DIR_1_Pin LED2_GREEN_Pin */
-  GPIO_InitStruct.Pin = M3_DIR_1_Pin | LED2_GREEN_Pin;
+  GPIO_InitStruct.Pin = M3_DIR_1_Pin|LED2_GREEN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : M1_PWM_Pin M2_PWM_Pin M1_DIR_2_Pin */
-  GPIO_InitStruct.Pin = M1_PWM_Pin | M2_PWM_Pin | M1_DIR_2_Pin;
+  GPIO_InitStruct.Pin = M1_PWM_Pin|M2_PWM_Pin|M1_DIR_2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -716,7 +747,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(CTP_INT_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : B_USER_Pin M1_ENC_2_Pin */
-  GPIO_InitStruct.Pin = B_USER_Pin | M1_ENC_2_Pin;
+  GPIO_InitStruct.Pin = B_USER_Pin|M1_ENC_2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
@@ -730,7 +761,8 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : M3_PWM_Pin LCD_CTP_RST_Pin LCD_TE_Pin WIFI_WKUP_Pin
                            M2_DIR_1_Pin */
-  GPIO_InitStruct.Pin = M3_PWM_Pin | LCD_CTP_RST_Pin | LCD_TE_Pin | WIFI_WKUP_Pin | M2_DIR_1_Pin;
+  GPIO_InitStruct.Pin = M3_PWM_Pin|LCD_CTP_RST_Pin|LCD_TE_Pin|WIFI_WKUP_Pin
+                          |M2_DIR_1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -746,7 +778,8 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : M3_ENC_2_Pin M3_ENC_1_Pin M2_ENC_2_Pin M2_ENC_1_Pin
                            M1_ENC_1_Pin */
-  GPIO_InitStruct.Pin = M3_ENC_2_Pin | M3_ENC_1_Pin | M2_ENC_2_Pin | M2_ENC_1_Pin | M1_ENC_1_Pin;
+  GPIO_InitStruct.Pin = M3_ENC_2_Pin|M3_ENC_1_Pin|M2_ENC_2_Pin|M2_ENC_1_Pin
+                          |M1_ENC_1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
@@ -758,7 +791,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(USB_OTG_FS_OVRCR_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : USB_OTG_FS_PWR_EN_Pin M1_DIR_1_Pin */
-  GPIO_InitStruct.Pin = USB_OTG_FS_PWR_EN_Pin | M1_DIR_1_Pin;
+  GPIO_InitStruct.Pin = USB_OTG_FS_PWR_EN_Pin|M1_DIR_1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -773,6 +806,7 @@ static void MX_GPIO_Init(void)
 
   HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+
 }
 
 /* FSMC initialization function */
@@ -821,7 +855,7 @@ static void MX_FSMC_Init(void)
 
   if (HAL_SRAM_Init(&hsram1, &Timing, NULL) != HAL_OK)
   {
-    Error_Handler();
+    Error_Handler( );
   }
 
   /** Perform the SRAM2 memory initialization sequence
@@ -856,7 +890,7 @@ static void MX_FSMC_Init(void)
 
   if (HAL_SRAM_Init(&hsram2, &Timing, NULL) != HAL_OK)
   {
-    Error_Handler();
+    Error_Handler( );
   }
 
   /* USER CODE BEGIN FSMC_Init 2 */
@@ -926,19 +960,26 @@ void Start_Motor_2_PWM(void *argument)
   /* Infinite loop */
   for (;;)
   {
-
+    //osDelay(1);
     ChalkBoi::getInstance().startPID2();
   }
   /* USER CODE END Start_Motor_2_PWM */
 }
 
+/* USER CODE BEGIN Header_Start_Motor_3_PWM */
+/**
+* @brief Function implementing the Motor_3_PWM_Dri thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Start_Motor_3_PWM */
 void Start_Motor_3_PWM(void *argument)
 {
   /* USER CODE BEGIN Start_Motor_3_PWM */
   /* Infinite loop */
   for (;;)
   {
-
+//osDelay(1);
     ChalkBoi::getInstance().startPID3();
   }
   /* USER CODE END Start_Motor_3_PWM */
@@ -967,7 +1008,7 @@ void Check_Motor_3_Velocity(void *argument)
   /* USER CODE END Check_Motor_3_Velocity */
 }
 
-/**
+ /**
   * @brief  Period elapsed callback in non blocking mode
   * @note   This function is called  when TIM6 interrupt took place, inside
   * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
@@ -980,8 +1021,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 0 */
 
   /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM6)
-  {
+  if (htim->Instance == TIM6) {
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
@@ -1004,7 +1044,7 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef USE_FULL_ASSERT
+#ifdef  USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
   *         where the assert_param error has occurred.

@@ -110,6 +110,7 @@ void HandleEncoderUpdate();
 #define CODEC_SD_GPIO_Port GPIOC
 #define B_USER_Pin GPIO_PIN_0
 #define B_USER_GPIO_Port GPIOA
+#define B_USER_EXTI_IRQn EXTI0_IRQn
 #define ARD_A1_Pin GPIO_PIN_1
 #define ARD_A1_GPIO_Port GPIOA
 #define ARD_A2_Pin GPIO_PIN_2

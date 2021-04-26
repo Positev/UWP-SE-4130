@@ -73,6 +73,13 @@ void ChalkBoi::startPID3()
 	pid3->motorController->pwmPulse();
 }
 
+void ChalkBoi::stop()
+{
+	pid1->setStop();
+	pid2->setStop();
+	pid3->setStop();
+}
+
 //TODO delete these pointers in the destructor to avoid memory leak
 
 ChalkBoi::ChalkBoi()

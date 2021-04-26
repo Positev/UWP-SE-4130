@@ -29,6 +29,7 @@ public:
 	void startPID1();
 	void startPID2();
 	void startPID3();
+	void stop();
 
 private:
 
