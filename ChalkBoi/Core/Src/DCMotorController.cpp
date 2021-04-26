@@ -11,7 +11,7 @@ DCMotorController::DCMotorController(GPIO_TypeDef* port, uint16_t pin, GPIO_Type
 
   this->frequency = 20;
   this->power = 0;
-  this->direction = DCMotorController::Clockwise;
+  this->direction = Clockwise;
 } 
 
 void DCMotorController::setPower(float power){
@@ -37,10 +37,10 @@ void DCMotorController::pwmPulse(){
   }
 
 void DCMotorController::setDirection(MotorDirection direction){
-  if (direction == DCMotorController::Clockwise){
+  if (direction == Clockwise){
       HAL_GPIO_WritePin(this->dir1Port, this->dir1Pin, GPIO_PIN_SET) ;
       HAL_GPIO_WritePin(this->dir2Port, this->dir2Pin, GPIO_PIN_RESET) ;
-  }else if (direction == DCMotorController::CounterClockwise){
+  }else if (direction == CounterClockwise){
 
       HAL_GPIO_WritePin(this->dir1Port, this->dir1Pin,GPIO_PIN_RESET ) ;
       HAL_GPIO_WritePin(this->dir2Port, this->dir2Pin, GPIO_PIN_SET) ;

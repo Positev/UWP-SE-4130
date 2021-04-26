@@ -20,7 +20,7 @@ private:
     WheelDriver *wheelB;
     WheelDriver *wheelC;
 
-    PIDDRIVER pid;
+    PIDDriver pid;
 
 
 public:

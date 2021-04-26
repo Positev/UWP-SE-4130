@@ -24,7 +24,15 @@ public:
 
 	void encoderTick();
 
+	void setForward(int);
+	void setTurn(MotorDirection, int);
+	void move();
+
 private:
+
+	PIDDriver* pid1;
+	PIDDriver* pid2;
+	PIDDriver* pid3;
 
 	DCMotorController *motor1;
 	DCMotorController *motor2;
