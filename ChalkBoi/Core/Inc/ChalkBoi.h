@@ -26,7 +26,9 @@ public:
 
 	void setForward(int);
 	void setTurn(MotorDirection, int);
-	void move();
+	void startPID1();
+	void startPID2();
+	void startPID3();
 
 private:
 

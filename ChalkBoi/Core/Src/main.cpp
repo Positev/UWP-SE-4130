@@ -70,7 +70,7 @@ osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
     .name = "defaultTask",
     .stack_size = 128 * 4,
-    .priority = (osPriority_t)osPriorityNormal,
+    .priority = (osPriority_t)osPriorityAboveNormal4,
 };
 /* Definitions for Motor_1_PWM_Dri */
 osThreadId_t Motor_1_PWM_DriHandle;
@@ -885,6 +885,7 @@ void StartDefaultTask(void *argument)
   /* init code for USB_HOST */
   MX_USB_HOST_Init();
   /* USER CODE BEGIN 5 */
+  ChalkBoi::getInstance().setForward(10);
   /* Infinite loop */
   for (;;)
   {
@@ -903,11 +904,11 @@ void StartDefaultTask(void *argument)
 void Start_Motor_1_PWM(void *argument)
 {
   /* USER CODE BEGIN Start_Motor_1_PWM */
-  ChalkBoi::getInstance().setForward(10);
+  
   /* Infinite loop */
   for (;;)
   {
-    ChalkBoi::getInstance().move();
+    ChalkBoi::getInstance().startPID1();
   }
   /* USER CODE END Start_Motor_1_PWM */
 }
@@ -926,8 +927,7 @@ void Start_Motor_2_PWM(void *argument)
   for (;;)
   {
 
-    //ChalkBoi::getInstance().pwmPulse(2);
-    //chalkey->pwmPulse(1);
+    ChalkBoi::getInstance().startPID2();
   }
   /* USER CODE END Start_Motor_2_PWM */
 }
@@ -939,8 +939,7 @@ void Start_Motor_3_PWM(void *argument)
   for (;;)
   {
 
-    //ChalkBoi::getInstance().pwmPulse(3);
-    //chalkey->pwmPulse(1);
+    ChalkBoi::getInstance().startPID3();
   }
   /* USER CODE END Start_Motor_3_PWM */
 }
