@@ -168,7 +168,13 @@ void DebugMon_Handler(void)
 void EXTI0_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI0_IRQn 0 */
-  ChalkBoi::getInstance().stop();
+  ChalkBoi::getInstance().stopPID1();
+  ChalkBoi::getInstance().stopPID2();
+  ChalkBoi::getInstance().stopPID3();
+  ChalkBoi::getInstance().updateMotor3State();
+  ChalkBoi::getInstance().getPID2();
+  ChalkBoi::getInstance().getPID3();
+
   /* USER CODE END EXTI0_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
   /* USER CODE BEGIN EXTI0_IRQn 1 */
@@ -188,6 +194,7 @@ void EXTI4_IRQHandler(void)
   /* USER CODE BEGIN EXTI4_IRQn 1 */
 
   HandleEncoderUpdate();
+  // CallUpdate encoder method from Main.h
   /* USER CODE END EXTI4_IRQn 1 */
 }
 
@@ -204,6 +211,7 @@ void EXTI9_5_IRQHandler(void)
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
   /* USER CODE BEGIN EXTI9_5_IRQn 1 */
 
+  // CallUpdate encoder method from Main.h
   HandleEncoderUpdate();
   /* USER CODE END EXTI9_5_IRQn 1 */
 }
@@ -222,6 +230,7 @@ void EXTI15_10_IRQHandler(void)
   /* USER CODE BEGIN EXTI15_10_IRQn 1 */
   HandleEncoderUpdate();
   /* USER CODE END EXTI15_10_IRQn 1 */
+  // CallUpdate encoder method from Main.h
 }
 
 /**

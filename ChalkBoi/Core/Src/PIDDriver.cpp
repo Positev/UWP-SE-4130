@@ -10,7 +10,7 @@ PIDDriver::PIDDriver(MotorNumber number)
     else if (number == Motor2)
     {
         this->motorController = new DCMotorController(M2_PWM_GPIO_Port, M2_PWM_Pin, M2_DIR_1_GPIO_Port, M2_DIR_1_Pin, M2_DIR_2_GPIO_Port, M2_DIR_2_Pin);
-        this->encoder= new RoteryEncoderMonitor(M2_ENC_1_GPIO_Port, M2_ENC_1_Pin, M2_ENC_2_GPIO_Port, M2_ENC_2_Pin);
+        this->encoder = new RoteryEncoderMonitor(M2_ENC_1_GPIO_Port, M2_ENC_1_Pin, M2_ENC_2_GPIO_Port, M2_ENC_2_Pin);
     }
     else
     {
@@ -25,18 +25,34 @@ void PIDDriver::setDutyCycle(float dutyCycle)
     this->motorController->setPower(this->dutyCycle);
 }
 
-void PIDDriver::setDirectory(MotorDirection directory)
+void PIDDriver::setDirectory(MotorDirection direction)
 {
-    this->directory = directory;
-    this->motorController->setDirection(this->directory);
+    this->direction = direction;
+    this->motorController->setDirection(this->direction);
 }
 
-void PIDDriver::setAngularVelocity(int angularVelocity)
+void PIDDriver::setTickTarget(int tick)
 {
-    this->angularVelocity = angularVelocity;
+    this->tickTarget = tick;
 }
 
 void PIDDriver::setStop()
 {
     this->motorController->stop();
+}
+
+PIDState PIDDriver::getState()
+{
+    return this->pidState;
+}
+
+int PIDDriver::checkState()
+{
+    int c1 = encoder->getCount();
+    int c2 = tickTarget;
+    int c3 = tickTarget;
+    if (encoder->getCount() > tickTarget)
+        return 1;
+    else
+        return 0;
 }

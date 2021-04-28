@@ -13,30 +13,33 @@
 #include "DriveTrainController.h"
 #include "ChalkBoi.h"
 #include "string.h"
+# define M_PI           3.14159265358979323846  /* pi */
+
+extern int motor1State;
+extern int motor2State;
+extern int motor3State;
 
 ChalkBoi &ChalkBoi::getInstance()
 {
-
 	static ChalkBoi instance;
-
 	return instance;
 }
 
-void ChalkBoi::pwmPulse(int motor)
-{
-	if (motor == 1)
-	{
-		return motor1->pwmPulse();
-	}
-	else if (motor == 2)
-	{
-		return motor2->pwmPulse();
-	}
-	else if (motor == 3)
-	{
-		return motor3->pwmPulse();
-	}
-}
+// void ChalkBoi::pwmPulse(int motor)
+// {
+// 	if (motor == 1)
+// 	{
+// 		return motor1->pwmPulse();
+// 	}
+// 	else if (motor == 2)
+// 	{
+// 		return motor2->pwmPulse();
+// 	}
+// 	else if (motor == 3)
+// 	{
+// 		return motor3->pwmPulse();
+// 	}
+// }
 void ChalkBoi::encoderTick()
 {
 
@@ -47,15 +50,33 @@ void ChalkBoi::encoderTick()
 
 void ChalkBoi::setForward(int distance)
 {
+
 	pid1->setStop();
-	pid2->setDutyCycle(0.3);
+
+	pid2->setDutyCycle(0.1);
 	pid2->setDirectory(MotorDirection::CounterClockwise);
-	pid3->setDutyCycle(0.3);
+	pid2->setTickTarget(280 / (3 * M_PI)/ 0.866 * distance);
+
+	pid3->setDutyCycle(0.1);
 	pid3->setDirectory(MotorDirection::Clockwise);
+	pid3->setTickTarget(280 / (3 * M_PI)/ 0.866 * distance);
 }
 
-void ChalkBoi::setTurn(MotorDirection directory, int angle)
+void ChalkBoi::setTurn(MotorDirection direction, int angle)
 {
+	//Radius of Robot's spin: 5.196
+
+	// pid1->setDutyCycle(0.125);
+	// pid1->setDirectory(direction);
+	// pid1->setTickTarget(280 / (3 * M_PI) * 5.196 * angle);
+
+	// pid2->setDutyCycle(0.125);
+	// pid2->setDirectory(direction);
+	// pid2->setTickTarget(280 / (3 * M_PI) * 5.196 * angle);
+
+	pid3->setDutyCycle(0.2);
+	pid3->setDirectory(direction);
+	pid3->setTickTarget(258 / (3 * M_PI) * 5.196 * angle);
 }
 
 void ChalkBoi::startPID1()
@@ -73,11 +94,63 @@ void ChalkBoi::startPID3()
 	pid3->motorController->pwmPulse();
 }
 
-void ChalkBoi::stop()
+void ChalkBoi::stopPID1()
 {
 	pid1->setStop();
+}
+
+void ChalkBoi::stopPID2()
+{
 	pid2->setStop();
+}
+void ChalkBoi::stopPID3()
+{
 	pid3->setStop();
+}
+
+void ChalkBoi::updateMotor1State()
+{
+	motor1State=pid1->checkState();
+}
+
+void ChalkBoi::updateMotor2State()
+{
+	motor2State=pid2->checkState();
+}
+
+void ChalkBoi::updateMotor3State()
+{
+	motor3State=pid3->checkState();
+}
+
+RoteryEncoderMonitor *ChalkBoi::getEncoder1()
+{
+	return this->encoder1;
+}
+
+RoteryEncoderMonitor *ChalkBoi::getEncoder2()
+{
+	return this->encoder2;
+}
+
+RoteryEncoderMonitor *ChalkBoi::getEncoder3()
+{
+	return this->encoder1;
+}
+
+PIDDriver *ChalkBoi::getPID1()
+{
+	return this->pid1;
+}
+
+PIDDriver *ChalkBoi::getPID2()
+{
+	return this->pid2;
+}
+
+PIDDriver *ChalkBoi::getPID3()
+{
+	return this->pid3;
 }
 
 //TODO delete these pointers in the destructor to avoid memory leak
@@ -98,9 +171,9 @@ ChalkBoi::ChalkBoi()
 	//motor1->setDirection(DCMotorController::Clockwise);
 	// motor2->setDirection(DCMotorController::CounterClockwise);
 	// motor3->setDirection(DCMotorController::Clockwise);
-	// encoder1 = new RoteryEncoderMonitor(M1_ENC_1_GPIO_Port, M1_ENC_1_Pin, M1_ENC_2_GPIO_Port, M1_ENC_2_Pin);
-	// encoder2 = new RoteryEncoderMonitor(M2_ENC_1_GPIO_Port, M2_ENC_1_Pin, M2_ENC_2_GPIO_Port, M2_ENC_2_Pin);
-	// encoder3 = new RoteryEncoderMonitor(M3_ENC_1_GPIO_Port, M3_ENC_1_Pin, M3_ENC_2_GPIO_Port, M3_ENC_2_Pin);
+	encoder1 = new RoteryEncoderMonitor(M1_ENC_1_GPIO_Port, M1_ENC_1_Pin, M1_ENC_2_GPIO_Port, M1_ENC_2_Pin);
+	encoder2 = new RoteryEncoderMonitor(M2_ENC_1_GPIO_Port, M2_ENC_1_Pin, M2_ENC_2_GPIO_Port, M2_ENC_2_Pin);
+	encoder3 = new RoteryEncoderMonitor(M3_ENC_1_GPIO_Port, M3_ENC_1_Pin, M3_ENC_2_GPIO_Port, M3_ENC_2_Pin);
 
 	//wheel1 = new WheelDriver(motor1, encoder1);
 	//wheel2 = new WheelDriver(motor2, encoder2);

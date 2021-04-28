@@ -14,13 +14,14 @@
 #include "main.h"
 
 
-class ChalkBoi{
 
+class ChalkBoi
+{
 
 public:
-	static ChalkBoi& getInstance();
+	static ChalkBoi &getInstance();
 
-	void pwmPulse(int motor);
+	//void pwmPulse(int motor);
 
 	void encoderTick();
 
@@ -29,28 +30,40 @@ public:
 	void startPID1();
 	void startPID2();
 	void startPID3();
-	void stop();
+void updateMotor1State();
+void updateMotor2State();
+void updateMotor3State();
+	void stopPID1();
+	void stopPID2();
+	void stopPID3();
+	RoteryEncoderMonitor *getEncoder1();
+	RoteryEncoderMonitor *getEncoder2();
+	RoteryEncoderMonitor *getEncoder3();
+	PIDDriver *getPID1();
+	PIDDriver *getPID2();
+	PIDDriver *getPID3();
 
 private:
+	PIDDriver *pid1;
+	PIDDriver *pid2;
+	PIDDriver *pid3;
 
-	PIDDriver* pid1;
-	PIDDriver* pid2;
-	PIDDriver* pid3;
+	
 
-	DCMotorController *motor1;
-	DCMotorController *motor2;
-	DCMotorController *motor3;
+	// DCMotorController *motor1;
+	// DCMotorController *motor2;
+	// DCMotorController *motor3;
 
 	RoteryEncoderMonitor *encoder1;
 	RoteryEncoderMonitor *encoder2;
 	RoteryEncoderMonitor *encoder3;
 
-	WheelDriver *wheel1;
-	WheelDriver *wheel2;
-	WheelDriver *wheel3;
+	// WheelDriver *wheel1;
+	// WheelDriver *wheel2;
+	// WheelDriver *wheel3;
 
-	DriveTrainController *driveBase;
+	// DriveTrainController *driveBase;
 
 	ChalkBoi();
-  ChalkBoi& operator=(const ChalkBoi&);
+	ChalkBoi &operator=(const ChalkBoi &);
 };
