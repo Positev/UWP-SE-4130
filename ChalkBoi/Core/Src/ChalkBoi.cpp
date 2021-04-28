@@ -50,33 +50,36 @@ void ChalkBoi::encoderTick()
 
 void ChalkBoi::setForward(int distance)
 {
+	float BASE_CYCLE = 0.2;
 
-	pid1->setStop();
+	pid1->setDutyCycle(BASE_CYCLE);
+	pid1->setDirectory(MotorDirection::CounterClockwise);
+	pid1->setTickTarget(280 / (3 * M_PI)/ 0.866 * distance);
 
-	pid2->setDutyCycle(0.1);
-	pid2->setDirectory(MotorDirection::CounterClockwise);
+	pid2->setDutyCycle(BASE_CYCLE);
+	pid2->setDirectory(MotorDirection::Clockwise);
 	pid2->setTickTarget(280 / (3 * M_PI)/ 0.866 * distance);
 
-	pid3->setDutyCycle(0.1);
-	pid3->setDirectory(MotorDirection::Clockwise);
-	pid3->setTickTarget(280 / (3 * M_PI)/ 0.866 * distance);
+	pid3->setStop();
 }
 
 void ChalkBoi::setTurn(MotorDirection direction, int angle)
 {
 	//Radius of Robot's spin: 5.196
 
-	// pid1->setDutyCycle(0.125);
-	// pid1->setDirectory(direction);
-	// pid1->setTickTarget(280 / (3 * M_PI) * 5.196 * angle);
+    float BASE_CYCLE = 0.125;
 
-	// pid2->setDutyCycle(0.125);
-	// pid2->setDirectory(direction);
-	// pid2->setTickTarget(280 / (3 * M_PI) * 5.196 * angle);
+	pid1->setDutyCycle(BASE_CYCLE);
+	pid1->setDirectory(direction);
+	pid1->setTickTarget(280 / (3 * M_PI) * 5.196 * angle);
 
-	pid3->setDutyCycle(0.2);
+	pid2->setDutyCycle(BASE_CYCLE);
+	pid2->setDirectory(direction);
+	pid2->setTickTarget(280 / (3 * M_PI) * 5.196 * angle);
+
+	pid3->setDutyCycle(BASE_CYCLE);
 	pid3->setDirectory(direction);
-	pid3->setTickTarget(258 / (3 * M_PI) * 5.196 * angle);
+	pid3->setTickTarget(280 / (3 * M_PI) * 5.196 * angle);
 }
 
 void ChalkBoi::startPID1()

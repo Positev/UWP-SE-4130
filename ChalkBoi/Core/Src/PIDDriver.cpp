@@ -48,7 +48,9 @@ PIDState PIDDriver::getState()
 
 int PIDDriver::checkState()
 {
+    int c0 = 0;
     int c1 = encoder->getCount();
+    int c11 = encoder->tickCount;
     int c2 = tickTarget;
     int c3 = tickTarget;
     if (encoder->getCount() > tickTarget)

@@ -1,5 +1,11 @@
 #include"RoteryEncoderMonitor.h"
 #include"main.h"
+
+extern int m1TickCount;
+extern int m2TickCount;
+extern int m3TickCount;
+
+
 RoteryEncoderMonitor::RoteryEncoderMonitor(GPIO_TypeDef* portA, uint16_t pinA, GPIO_TypeDef* portB, uint16_t pinB ){
     this->signalAPort = portA;
     this->signalAPin = pinA;
@@ -18,12 +24,12 @@ void RoteryEncoderMonitor::handleChange(){
     		// If the DT state is different than the CLK state then
     		// the encoder is rotating CCW so decrement
     		if (newReadingB != this->lastReadingB) {
-    			this->tickCount --;
-    			this->direction = RoteryEncoderMonitor::CounterClockwise;
+    			tickCount--;
+    			direction = RoteryEncoderMonitor::CounterClockwise;
     		} else {
     			// Encoder is rotating CW so increment
-    			this->tickCount ++;
-    			this->direction = RoteryEncoderMonitor::Clockwise;
+    			tickCount++;
+    			direction = RoteryEncoderMonitor::Clockwise;
     		}
 
     	}
@@ -35,7 +41,8 @@ void RoteryEncoderMonitor::handleChange(){
 }
 
 int RoteryEncoderMonitor::getCount(){
-    return this->tickCount;
+    int count = tickCount;
+    return count;
 }
 
 void RoteryEncoderMonitor::reset(){

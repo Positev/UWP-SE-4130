@@ -141,6 +141,16 @@ static void MX_NVIC_Init(void);
 int motor1State = 0;
 int motor2State = 0;
 int motor3State = 0;
+
+int m1TickCount = 0;
+int m2TickCount = 0;
+int m3TickCount = 0;
+
+int m1TickTarget = 0;
+int m2TickTarget = 0;
+int m3TickTarget = 0;
+
+int robMode = 0;
 /* USER CODE END 0 */
 
 /**
@@ -915,7 +925,7 @@ void StartDefaultTask(void *argument)
   /* init code for USB_HOST */
   MX_USB_HOST_Init();
   /* USER CODE BEGIN 5 */
-  ChalkBoi::getInstance().setForward(4);
+  //ChalkBoi::getInstance().setForward(4);
   //ChalkBoi::getInstance().setTurn(MotorDirection::CounterClockwise, 9);
   /* Infinite loop */
   for (;;)
