@@ -926,7 +926,7 @@ void StartDefaultTask(void *argument)
   MX_USB_HOST_Init();
   /* USER CODE BEGIN 5 */
   //ChalkBoi::getInstance().setForward(4);
-  //ChalkBoi::getInstance().setTurn(MotorDirection::CounterClockwise, 9);
+  ChalkBoi::getInstance().setTurn(MotorDirection::CounterClockwise, 9);
   /* Infinite loop */
   for (;;)
   {
@@ -1008,6 +1008,7 @@ void Start_Motor_3_PWM(void *argument)
 void Check_Motor_1_Velocity(void *argument)
 {
   /* USER CODE BEGIN Check_Motor_1_Velocity */
+  int b=0;
   /* USER CODE END Check_Motor_1_Velocity */
 }
 
@@ -1015,7 +1016,7 @@ void Check_Motor_1_Velocity(void *argument)
 void Check_Motor_2_Velocity(void *argument)
 {
   /* USER CODE BEGIN Check_Motor_2_Velocity */
-
+int b=0;
   /* USER CODE END Check_Motor_2_Velocity */
 }
 

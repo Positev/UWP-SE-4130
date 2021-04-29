@@ -169,21 +169,22 @@ void DebugMon_Handler(void)
 void EXTI0_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI0_IRQn 0 */
-  robMode = (robMode + 1) % 3;
-  if (robMode == 0)
-  {
-    ChalkBoi::getInstance().stopPID1();
-    ChalkBoi::getInstance().stopPID2();
-    ChalkBoi::getInstance().stopPID3();
-  }
-  else if (robMode == 1)
-  {
-    ChalkBoi::getInstance().setTurn(MotorDirection::CounterClockwise, 9);
-  }
-  else
-  {
-    ChalkBoi::getInstance().setForward(4);
-  }
+  int aa= ChalkBoi::getInstance().getEncoder2()->getCount();
+  // robMode = (robMode + 1) % 3;
+  // if (robMode == 0)
+  // {
+  //   ChalkBoi::getInstance().stopPID1();
+  //   ChalkBoi::getInstance().stopPID2();
+  //   ChalkBoi::getInstance().stopPID3();
+  // }
+  // else if (robMode == 1)
+  // {
+  //   ChalkBoi::getInstance().setTurn(MotorDirection::CounterClockwise, 9);
+  // }
+  // else
+  // {
+  //   ChalkBoi::getInstance().setForward(4);
+  // }
 
   /* USER CODE END EXTI0_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
