@@ -50,13 +50,13 @@ void ChalkBoi::encoderTick()
 
 void ChalkBoi::setForward(int distance)
 {
-	float BASE_CYCLE = 0.2;
+	float BASE_CYCLE = 0.42;
 
 	pid1->setDutyCycle(BASE_CYCLE);
 	pid1->setDirectory(MotorDirection::CounterClockwise);
 	pid1->setTickTarget(280 / (3 * M_PI)/ 0.866 * distance);
 
-	pid2->setDutyCycle(BASE_CYCLE);
+	pid2->setDutyCycle(BASE_CYCLE + .1);
 	pid2->setDirectory(MotorDirection::Clockwise);
 	pid2->setTickTarget(280 / (3 * M_PI)/ 0.866 * distance);
 
@@ -67,7 +67,7 @@ void ChalkBoi::setTurn(MotorDirection direction, int angle)
 {
 	//Radius of Robot's spin: 5.196
 
-    float BASE_CYCLE = 0.125;
+    float BASE_CYCLE = 0.35;
 
 	pid1->setDutyCycle(BASE_CYCLE);
 	pid1->setDirectory(direction);
@@ -99,15 +99,18 @@ void ChalkBoi::startPID3()
 
 void ChalkBoi::stopPID1()
 {
+	pid1->encoder->tickCount = 0;
 	pid1->setStop();
 }
 
 void ChalkBoi::stopPID2()
 {
+	pid2->encoder->tickCount = 0;
 	pid2->setStop();
 }
 void ChalkBoi::stopPID3()
 {
+	pid3->encoder->tickCount = 0;
 	pid3->setStop();
 }
 
@@ -138,7 +141,7 @@ RoteryEncoderMonitor *ChalkBoi::getEncoder2()
 
 RoteryEncoderMonitor *ChalkBoi::getEncoder3()
 {
-	return this->encoder1;
+	return this->encoder3;
 }
 
 PIDDriver *ChalkBoi::getPID1()
@@ -153,6 +156,7 @@ PIDDriver *ChalkBoi::getPID2()
 
 PIDDriver *ChalkBoi::getPID3()
 {
+	
 	return this->pid3;
 }
 

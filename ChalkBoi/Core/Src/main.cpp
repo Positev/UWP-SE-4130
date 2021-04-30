@@ -71,7 +71,7 @@ osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
     .name = "defaultTask",
     .stack_size = 128 * 4,
-    .priority = (osPriority_t)osPriorityNormal1,
+    .priority = (osPriority_t)osPriorityNormal,
 };
 /* Definitions for Motor_1_PWM_Dri */
 osThreadId_t Motor_1_PWM_DriHandle;
@@ -911,6 +911,9 @@ void HandleEncoderUpdate()
 
   ChalkBoi::getInstance().encoderTick();
 }
+int pathState = 0;
+int runState = 1;
+int line = 0;
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -925,12 +928,56 @@ void StartDefaultTask(void *argument)
   /* init code for USB_HOST */
   MX_USB_HOST_Init();
   /* USER CODE BEGIN 5 */
-  //ChalkBoi::getInstance().setForward(4);
-  ChalkBoi::getInstance().setTurn(MotorDirection::CounterClockwise, 9);
+  int target = 0;
+  //ChalkBoi::getInstance().setTurn(MotorDirection::CounterClockwise, 9);
   /* Infinite loop */
   for (;;)
   {
     osDelay(1);
+    switch (runState)
+    {
+      case 0:{
+        int c= ChalkBoi::getInstance().getEncoder2()->getCount() ;
+        if (c > target || c <-target){
+          ChalkBoi::getInstance().getPID1()->setStop();
+          ChalkBoi::getInstance().getPID2()->setStop();
+          ChalkBoi::getInstance().getPID3()->setStop();
+          ChalkBoi::getInstance().getPID1()->encoder->reset();
+          ChalkBoi::getInstance().getPID2()->encoder->reset();
+          ChalkBoi::getInstance().getPID3()->encoder->reset();
+          if (line < 4){ 
+            runState = 1;
+          }
+        }
+        break;
+
+      }
+      case 1:{
+        switch(pathState){
+              case 0:{// Forward
+                line ++;
+                ChalkBoi::getInstance().setForward(0);
+                target = 30;
+                pathState = 1;
+                runState = 0;
+                break;
+              }
+              case 1:{ // Turn
+                ChalkBoi::getInstance().setTurn(Clockwise, 1);
+                target = 60;
+                runState = 0;
+                pathState = 0;
+
+                break;
+              }
+            }
+        break;
+
+      }
+    }
+    
+    
+
   }
   /* USER CODE END 5 */
 }
@@ -951,7 +998,7 @@ void Start_Motor_1_PWM(void *argument)
   {
     // ChalkBoi::getInstance().getPID1()->updateState();
     // if (ChalkBoi::getInstance().getPID1()->getState() == PIDEnable)
-      ChalkBoi::getInstance().startPID1();
+    ChalkBoi::getInstance().startPID1();
     // else
     //   ChalkBoi::getInstance().stopPID1();
     osDelay(1);
@@ -975,7 +1022,7 @@ void Start_Motor_2_PWM(void *argument)
     //osDelay(1);
     // ChalkBoi::getInstance().getPID2()->updateState();
     // if (ChalkBoi::getInstance().getPID2()->getState() == PIDEnable)
-      ChalkBoi::getInstance().startPID2();
+    ChalkBoi::getInstance().startPID2();
     // else
     //   ChalkBoi::getInstance().stopPID2();
   }
@@ -996,7 +1043,7 @@ void Start_Motor_3_PWM(void *argument)
   for (;;)
   {
     //ChalkBoi::getInstance().updateMotor3State();
-    if (motor3State== 0)
+    if (motor3State == 0)
       ChalkBoi::getInstance().startPID3();
     else
       ChalkBoi::getInstance().stopPID3();
@@ -1008,7 +1055,7 @@ void Start_Motor_3_PWM(void *argument)
 void Check_Motor_1_Velocity(void *argument)
 {
   /* USER CODE BEGIN Check_Motor_1_Velocity */
-  int b=0;
+  int b = 0;
   /* USER CODE END Check_Motor_1_Velocity */
 }
 
@@ -1016,7 +1063,7 @@ void Check_Motor_1_Velocity(void *argument)
 void Check_Motor_2_Velocity(void *argument)
 {
   /* USER CODE BEGIN Check_Motor_2_Velocity */
-int b=0;
+  int b = 0;
   /* USER CODE END Check_Motor_2_Velocity */
 }
 
