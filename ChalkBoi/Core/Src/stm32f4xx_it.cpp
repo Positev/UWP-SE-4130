@@ -169,8 +169,11 @@ void DebugMon_Handler(void)
 void EXTI0_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI0_IRQn 0 */
-  int aa= ChalkBoi::getInstance().getEncoder2()->getCount();
-  // robMode = (robMode + 1) % 3;
+  //int aa= ChalkBoi::getInstance().getEncoder2()->getCount();
+  //robMode = (robMode + 1) % 3;
+    ChalkBoi::getInstance().stopPID1();
+    ChalkBoi::getInstance().stopPID2();
+    ChalkBoi::getInstance().stopPID3();
   // if (robMode == 0)
   // {
   //   ChalkBoi::getInstance().stopPID1();

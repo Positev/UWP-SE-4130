@@ -50,13 +50,13 @@ void ChalkBoi::encoderTick()
 
 void ChalkBoi::setForward(int distance)
 {
-	float BASE_CYCLE = 0.42;
+	float BASE_CYCLE = 0.4;
 
 	pid1->setDutyCycle(BASE_CYCLE);
 	pid1->setDirectory(MotorDirection::CounterClockwise);
 	pid1->setTickTarget(280 / (3 * M_PI)/ 0.866 * distance);
 
-	pid2->setDutyCycle(BASE_CYCLE + .1);
+	pid2->setDutyCycle(BASE_CYCLE);
 	pid2->setDirectory(MotorDirection::Clockwise);
 	pid2->setTickTarget(280 / (3 * M_PI)/ 0.866 * distance);
 
@@ -67,7 +67,7 @@ void ChalkBoi::setTurn(MotorDirection direction, int angle)
 {
 	//Radius of Robot's spin: 5.196
 
-    float BASE_CYCLE = 0.35;
+    float BASE_CYCLE = 0.45;
 
 	pid1->setDutyCycle(BASE_CYCLE);
 	pid1->setDirectory(direction);

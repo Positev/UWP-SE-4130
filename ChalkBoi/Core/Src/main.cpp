@@ -928,56 +928,112 @@ void StartDefaultTask(void *argument)
   /* init code for USB_HOST */
   MX_USB_HOST_Init();
   /* USER CODE BEGIN 5 */
-  int target = 0;
+  int target0 = 60;
+  int target1 = 140;
+  int target2 = 240;
+  int target3 = 290;
+  int target4 = 390;
+  int c=0;
   //ChalkBoi::getInstance().setTurn(MotorDirection::CounterClockwise, 9);
   /* Infinite loop */
   for (;;)
   {
     osDelay(1);
-    switch (runState)
-    {
-      case 0:{
-        int c= ChalkBoi::getInstance().getEncoder2()->getCount() ;
-        if (c > target || c <-target){
+    if (pathState == 0)
+      {
+        ChalkBoi::getInstance().setForward(0);
+        c = ChalkBoi::getInstance().getEncoder2()->getCount();
+        if (c > target0 || c < -target0)
+        {
+          ChalkBoi::getInstance().stopPID1();
+          ChalkBoi::getInstance().stopPID2();
+          ChalkBoi::getInstance().stopPID3();
+          pathState++;
+          // ChalkBoi::getInstance().getPID1()->encoder->reset();
+          // ChalkBoi::getInstance().getPID2()->encoder->reset();
+          // ChalkBoi::getInstance().getPID3()->encoder->reset();
+          // if (line < 4)
+          // {
+          //   runState = 1;
+          // }
+        }
+      }
+      else if (pathState == 1)
+      {
+        ChalkBoi::getInstance().setTurn(Clockwise, 1);
+        c = ChalkBoi::getInstance().getEncoder2()->getCount();
+        if (c > target1 || c < -target1)
+        {
+          ChalkBoi::getInstance().stopPID1();
+          ChalkBoi::getInstance().stopPID2();
+          ChalkBoi::getInstance().stopPID3();
+          pathState++;
+          // ChalkBoi::getInstance().getPID1()->encoder->reset();
+          // ChalkBoi::getInstance().getPID2()->encoder->reset();
+          // ChalkBoi::getInstance().getPID3()->encoder->reset();
+          // if (line < 4)
+          // {
+          //   runState = 1;
+          // }
+        }
+      }
+      else if (pathState == 2)
+      {
+        ChalkBoi::getInstance().setForward(0);
+        c = ChalkBoi::getInstance().getEncoder2()->getCount();
+        if (c > target2 || c < -target2)
+        {
+          ChalkBoi::getInstance().stopPID1();
+          ChalkBoi::getInstance().stopPID2();
+          ChalkBoi::getInstance().stopPID3();
+          pathState++;
+          // ChalkBoi::getInstance().getPID1()->encoder->reset();
+          // ChalkBoi::getInstance().getPID2()->encoder->reset();
+          // ChalkBoi::getInstance().getPID3()->encoder->reset();
+          // if (line < 4)
+          // {
+          //   runState = 1;
+          // }
+        }
+      }
+      else if (pathState == 3)
+      {
+        ChalkBoi::getInstance().setTurn(Clockwise, 1);
+        c = ChalkBoi::getInstance().getEncoder2()->getCount();
+        if (c > target3 || c < -target3)
+        {
           ChalkBoi::getInstance().getPID1()->setStop();
           ChalkBoi::getInstance().getPID2()->setStop();
           ChalkBoi::getInstance().getPID3()->setStop();
-          ChalkBoi::getInstance().getPID1()->encoder->reset();
-          ChalkBoi::getInstance().getPID2()->encoder->reset();
-          ChalkBoi::getInstance().getPID3()->encoder->reset();
-          if (line < 4){ 
-            runState = 1;
-          }
+          pathState++;
+          // ChalkBoi::getInstance().getPID1()->encoder->reset();
+          // ChalkBoi::getInstance().getPID2()->encoder->reset();
+          // ChalkBoi::getInstance().getPID3()->encoder->reset();
+          // if (line < 4)
+          // {
+          //   runState = 1;
+          // }
         }
-        break;
-
       }
-      case 1:{
-        switch(pathState){
-              case 0:{// Forward
-                line ++;
-                ChalkBoi::getInstance().setForward(0);
-                target = 30;
-                pathState = 1;
-                runState = 0;
-                break;
-              }
-              case 1:{ // Turn
-                ChalkBoi::getInstance().setTurn(Clockwise, 1);
-                target = 60;
-                runState = 0;
-                pathState = 0;
-
-                break;
-              }
-            }
-        break;
-
+      else if (pathState == 4)
+      {
+        ChalkBoi::getInstance().setForward(0);
+        c = ChalkBoi::getInstance().getEncoder2()->getCount();
+        if (c > target4 || c < -target4)
+        {
+          ChalkBoi::getInstance().getPID1()->setStop();
+          ChalkBoi::getInstance().getPID2()->setStop();
+          ChalkBoi::getInstance().getPID3()->setStop();
+          pathState++;
+          // ChalkBoi::getInstance().getPID1()->encoder->reset();
+          // ChalkBoi::getInstance().getPID2()->encoder->reset();
+          // ChalkBoi::getInstance().getPID3()->encoder->reset();
+          // if (line < 4)
+          // {
+          //   runState = 1;
+          // }
+        }
       }
-    }
-    
-    
-
   }
   /* USER CODE END 5 */
 }
