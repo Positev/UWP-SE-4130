@@ -26,6 +26,8 @@
 #include "string.h"
 #include <stdio.h>
 
+#include "PathData.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -928,33 +930,23 @@ void StartDefaultTask(void *argument)
   /* init code for USB_HOST */
   MX_USB_HOST_Init();
   /* USER CODE BEGIN 5 */
-  int triangle_move_type[5] = {0, 1, 0, 1, 0};
-  int triangle_move_target[5] = {100, 180, 280, 360, 460};
-  int triangle_path_state = 5;
-
-  int square_move_type[7] = {0, 1, 0, 1, 0, 1, 0};
-  int square_move_target[7] = {100, 160, 260, 320, 420, 480, 580};
-  int square_path_state = 7;
-
-  int pentagon_move_type[9] = {0, 1, 0, 1, 0, 1, 0, 1, 0};
-  int pentagon_move_target[9] = {100, 155, 255, 310, 410, 465, 565, 620, 720};
-  int pentagon_path_state = 9;
-
   int current_state = 0;
-  //ChalkBoi::getInstance().setTurn(MotorDirection::CounterClockwise, 9);
+  PathData *data = new PathData(4);
+  //PathData aa;
   /* Infinite loop */
   for (;;)
   {
     osDelay(1);
-    if (current_state < square_path_state)
+
+    if (current_state < data->path_state)
     {
-      if (square_move_type[current_state] == 0)
+      if (data->movement_type[current_state] == 0)
         ChalkBoi::getInstance().setForward(0);
       else
         ChalkBoi::getInstance().setTurn(Clockwise, 1);
 
       int c = ChalkBoi::getInstance().getEncoder2()->getCount();
-      if (c > square_move_target[current_state] || c < -square_move_target[current_state])
+      if (c > data->movement_target[current_state] || c < -data->movement_target[current_state])
       {
         ChalkBoi::getInstance().stopPID1();
         ChalkBoi::getInstance().stopPID2();
