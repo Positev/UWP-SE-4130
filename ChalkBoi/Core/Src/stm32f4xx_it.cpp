@@ -244,7 +244,6 @@ void EXTI15_10_IRQHandler(void)
   /* USER CODE BEGIN EXTI15_10_IRQn 1 */
   HandleEncoderUpdate();
   /* USER CODE END EXTI15_10_IRQn 1 */
-  // CallUpdate encoder method from Main.h
 }
 
 /**
