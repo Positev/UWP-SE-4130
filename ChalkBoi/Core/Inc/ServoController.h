@@ -8,7 +8,7 @@
 #ifndef SRC_CONTROLLERS_SERVOCONTROLLER_H_
 #define SRC_CONTROLLERS_SERVOCONTROLLER_H_
 
-
+#include "main.h"
 
 /*
  * Control a 180 noncontinuous pwm servo
@@ -19,15 +19,13 @@ class ServoController
 private:
 
 	//---Board implementation specific--------------------
-	int Port;
-	int Pin;
+	GPIO_TypeDef* pwmPort;
+	uint16_t pwmPin;
 	//---Board implementation specific--------------------
 
 
 	//---Motor parameters for desired behavior-----------
-
 	float angle;
-    int frequency;
 	//---Motor parameters for desired behavior-----------
 
 public:
@@ -36,7 +34,7 @@ public:
 	 * IN - PORT is the port used to identify the signal pin that is driven high and low for pwm
 	 * IN - PIN is the pin used to identify the signal pin that is driven high and low for pwm
 	 */
-	ServoController(int portA, int pinA);
+	ServoController(GPIO_TypeDef* port, uint16_t pin);
 
     /*
      * Rotate servo to angle, angle is range limited in degrees between 0 and 180

@@ -80,7 +80,6 @@ Middlewares/Third_Party/FreeRTOS/Source/timers.c \
 Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c \
 Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c \
 Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c \
-Core/Src/main.c
 
 
 CXXSOURCES= \
@@ -88,7 +87,8 @@ Core/Src/main.cpp \
 Core/Src/ChalkBoi.cpp \
 Core/Src/PIDDriver.cpp \
 Core/Src/DCMotorController.cpp \
-Core/Src/RoteryEncoderMonitor.cpp 
+Core/Src/RoteryEncoderMonitor.cpp \
+Core/Src/ServoController.cpp \
 
 # Find header directories
 INCLUDES= \

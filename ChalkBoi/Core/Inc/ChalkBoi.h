@@ -11,6 +11,7 @@
 #include "RoteryEncoderMonitor.h"
 #include "WheelDriver.h"
 #include "DriveTrainController.h"
+#include "ServoController.h"
 #include "main.h"
 
 
@@ -39,6 +40,7 @@ void updateMotor3State();
 	RoteryEncoderMonitor *getEncoder1();
 	RoteryEncoderMonitor *getEncoder2();
 	RoteryEncoderMonitor *getEncoder3();
+	ServoController *getServo();
 	PIDDriver *getPID1();
 	PIDDriver *getPID2();
 	PIDDriver *getPID3();
@@ -57,6 +59,8 @@ private:
 	RoteryEncoderMonitor *encoder1;
 	RoteryEncoderMonitor *encoder2;
 	RoteryEncoderMonitor *encoder3;
+
+	ServoController * servo;
 
 	// WheelDriver *wheel1;
 	// WheelDriver *wheel2;

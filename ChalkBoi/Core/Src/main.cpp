@@ -25,6 +25,11 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "ChalkBoi.h"
+#include "string.h"
+#include <stdio.h>
+
+#include "PathData.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -95,7 +100,7 @@ osThreadId_t Servo_PWMHandle;
 const osThreadAttr_t Servo_PWM_attributes = {
   .name = "Servo_PWM",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityBelowNormal,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for Motor_1_Velocity_Watch */
 osTimerId_t Motor_1_Velocity_WatchHandle;
@@ -195,7 +200,7 @@ int main(void)
   MX_FSMC_Init();
   MX_I2S2_Init();
   MX_QUADSPI_Init();
-  MX_SDIO_SD_Init();
+  //MX_SDIO_SD_Init();
   MX_UART10_Init();
   MX_USART6_UART_Init();
 
@@ -743,8 +748,8 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(M3_DIR_2_GPIO_Port, M3_DIR_2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, M3_PWM_Pin|LCD_CTP_RST_Pin|LCD_TE_Pin|WIFI_WKUP_Pin
-                          |M2_DIR_1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, M3_PWM_Pin|Servo_PWM_Pin|LCD_CTP_RST_Pin|LCD_TE_Pin
+                          |WIFI_WKUP_Pin|M2_DIR_1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOG, USB_OTG_FS_PWR_EN_Pin|M1_DIR_1_Pin, GPIO_PIN_RESET);
@@ -789,20 +794,14 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(M3_DIR_2_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : M3_PWM_Pin LCD_CTP_RST_Pin LCD_TE_Pin WIFI_WKUP_Pin
-                           M2_DIR_1_Pin */
-  GPIO_InitStruct.Pin = M3_PWM_Pin|LCD_CTP_RST_Pin|LCD_TE_Pin|WIFI_WKUP_Pin
-                          |M2_DIR_1_Pin;
+  /*Configure GPIO pins : M3_PWM_Pin Servo_PWM_Pin LCD_CTP_RST_Pin LCD_TE_Pin
+                           WIFI_WKUP_Pin M2_DIR_1_Pin */
+  GPIO_InitStruct.Pin = M3_PWM_Pin|Servo_PWM_Pin|LCD_CTP_RST_Pin|LCD_TE_Pin
+                          |WIFI_WKUP_Pin|M2_DIR_1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : Servo_PWM_Pin */
-  GPIO_InitStruct.Pin = Servo_PWM_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(Servo_PWM_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : M3_ENC_2_Pin M3_ENC_1_Pin M2_ENC_2_Pin M2_ENC_1_Pin
                            M1_ENC_1_Pin */
@@ -999,7 +998,6 @@ void Start_Motor_1_PWM(void *argument)
     ChalkBoi::getInstance().startPID1();
     // else
     //   ChalkBoi::getInstance().stopPID1();
-    osDelay(1);
   }
   /* USER CODE END Start_Motor_1_PWM */
 }
@@ -1062,7 +1060,7 @@ void Start_Servo_PWM(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    ChalkBoi::getInstance().getServo()->pwmPulse();
   }
   /* USER CODE END Start_Servo_PWM */
 }

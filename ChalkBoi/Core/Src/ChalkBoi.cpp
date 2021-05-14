@@ -160,6 +160,10 @@ PIDDriver *ChalkBoi::getPID3()
 	return this->pid3;
 }
 
+ServoController *ChalkBoi::getServo(){
+	return this->servo;
+}
+
 //TODO delete these pointers in the destructor to avoid memory leak
 
 ChalkBoi::ChalkBoi()
@@ -167,6 +171,8 @@ ChalkBoi::ChalkBoi()
 	pid1 = new PIDDriver(Motor1);
 	pid2 = new PIDDriver(Motor2);
 	pid3 = new PIDDriver(Motor3);
+
+	this->servo = new ServoController(Servo_PWM_GPIO_Port, Servo_PWM_Pin);
 
 	// motor1 = new DCMotorController(M1_PWM_GPIO_Port, M1_PWM_Pin, M1_DIR_1_GPIO_Port, M1_DIR_1_Pin, M1_DIR_2_GPIO_Port, M1_DIR_2_Pin);
 	// motor2 = new DCMotorController(M2_PWM_GPIO_Port, M2_PWM_Pin, M2_DIR_1_GPIO_Port, M2_DIR_1_Pin, M2_DIR_2_GPIO_Port, M2_DIR_2_Pin);
