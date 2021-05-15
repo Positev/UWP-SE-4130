@@ -102,6 +102,13 @@ const osThreadAttr_t Servo_PWM_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for LCD_UI_Task */
+osThreadId_t LCD_UI_TaskHandle;
+const osThreadAttr_t LCD_UI_Task_attributes = {
+  .name = "LCD_UI_Task",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
 /* Definitions for Motor_1_Velocity_Watch */
 osTimerId_t Motor_1_Velocity_WatchHandle;
 const osTimerAttr_t Motor_1_Velocity_Watch_attributes = {
@@ -139,6 +146,7 @@ void Start_Motor_1_PWM(void *argument);
 void Start_Motor_2_PWM(void *argument);
 void Start_Motor_3_PWM(void *argument);
 void Start_Servo_PWM(void *argument);
+void Update_LCD(void *argument);
 void Check_Motor_1_Velocity(void *argument);
 void Check_Motor_2_Velocity(void *argument);
 void Check_Motor_3_Velocity(void *argument);
@@ -200,7 +208,7 @@ int main(void)
   MX_FSMC_Init();
   MX_I2S2_Init();
   MX_QUADSPI_Init();
-  //MX_SDIO_SD_Init();
+  MX_SDIO_SD_Init();
   MX_UART10_Init();
   MX_USART6_UART_Init();
 
@@ -263,6 +271,9 @@ int main(void)
 
   /* creation of Servo_PWM */
   Servo_PWMHandle = osThreadNew(Start_Servo_PWM, NULL, &Servo_PWM_attributes);
+
+  /* creation of LCD_UI_Task */
+  LCD_UI_TaskHandle = osThreadNew(Update_LCD, NULL, &LCD_UI_Task_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -1070,6 +1081,24 @@ void Start_Servo_PWM(void *argument)
     ChalkBoi::getInstance().getServo()->pwmPulse();
   }
   /* USER CODE END Start_Servo_PWM */
+}
+
+/* USER CODE BEGIN Header_Update_LCD */
+/**
+* @brief Function implementing the LCD_UI_Task thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Update_LCD */
+void Update_LCD(void *argument)
+{
+  /* USER CODE BEGIN Update_LCD */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END Update_LCD */
 }
 
 /* Check_Motor_1_Velocity function */
