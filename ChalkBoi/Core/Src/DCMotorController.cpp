@@ -1,6 +1,7 @@
 #include "DCMotorController.h"
 #include "main.h"
 
+#include "cmsis_os.h"
 DCMotorController::DCMotorController(GPIO_TypeDef *port, uint16_t pin, GPIO_TypeDef *dir1Port, uint16_t dir1Pin, GPIO_TypeDef *dir2Port, uint16_t dir2Pin)
 {
   this->pwmPort = port;
@@ -39,10 +40,10 @@ void DCMotorController::pwmPulse()
   int frequency = this->frequency;
 
   HAL_GPIO_WritePin(pwmPort, pwmPin, GPIO_PIN_SET);
-  HAL_Delay(frequency * power);
+  osDelay(frequency * power);
 
   HAL_GPIO_WritePin(pwmPort, pwmPin, GPIO_PIN_RESET);
-  HAL_Delay(frequency * (1 - power));
+  osDelay(frequency * (1 - power));
 }
 
 void DCMotorController::setDirection(MotorDirection direction)

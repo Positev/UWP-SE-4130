@@ -959,12 +959,19 @@ void StartDefaultTask(void *argument)
   {
     osDelay(1);
 
-    if (current_state < data->path_state)
+
+    if ( current_state < data->path_state)
     {
-      if (data->movement_type[current_state] == 0)
-        ChalkBoi::getInstance().setForward(0);
+      if (data->movement_type[current_state] == 0){
+        ChalkBoi::getInstance().getServo()->goToAngle(00);
+        osDelay(2500);
+        ChalkBoi::getInstance().setForward(0);}
       else
-        ChalkBoi::getInstance().setTurn(Clockwise, 1);
+
+      {
+        ChalkBoi::getInstance().getServo()->goToAngle(180);
+        osDelay(2500);
+        ChalkBoi::getInstance().setTurn(Clockwise, 1);}
 
       int c = ChalkBoi::getInstance().getEncoder2()->getCount();
       if (c > data->movement_target[current_state] || c < -data->movement_target[current_state])

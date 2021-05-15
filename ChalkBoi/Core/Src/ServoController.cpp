@@ -1,10 +1,11 @@
 #include "ServoController.h"
 #include"main.h"
+#include "cmsis_os.h"
 
 ServoController::ServoController(GPIO_TypeDef* port, uint16_t pin){
   this->pwmPort = port;
   this->pwmPin = pin;
-  this->angle = 90;
+  this->angle = 0;
 }
 
 
@@ -14,14 +15,16 @@ void ServoController::goToAngle(float angle){
 
 void ServoController::pwmPulse(){
   
-  int frequency = 2;
-  float angle = 0 / 180;
-  float power = angle; // micro seconds
-
+  int frequency = 20;
+  float pos = (float) this->angle / 180;
+  float power =  (2.0 -.91) * pos + .91; // micro seconds
+  float on =  power;
+  float off = frequency-power;
 
   HAL_GPIO_WritePin(pwmPort, pwmPin, GPIO_PIN_SET);
-  HAL_Delay(frequency * power );
+  osDelay(on);
 
   HAL_GPIO_WritePin(pwmPort, pwmPin, GPIO_PIN_RESET);
-  HAL_Delay(frequency* (1 - power));
+  osDelay(off);
 }
+
