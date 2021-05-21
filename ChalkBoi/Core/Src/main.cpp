@@ -20,13 +20,16 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
-#include "ChalkBoi.h"
 #include "usb_host.h"
-#include "string.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "ChalkBoi.h"
+#include "string.h"
+#include <stdio.h>
+
+#include "PathData.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -76,21 +79,28 @@ osThreadId_t Motor_1_PWM_DriHandle;
 const osThreadAttr_t Motor_1_PWM_Dri_attributes = {
   .name = "Motor_1_PWM_Dri",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityAboveNormal4,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for Motor_2_PWM_Dri */
 osThreadId_t Motor_2_PWM_DriHandle;
 const osThreadAttr_t Motor_2_PWM_Dri_attributes = {
   .name = "Motor_2_PWM_Dri",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityAboveNormal4,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for Motor_3_PWM_Dri */
 osThreadId_t Motor_3_PWM_DriHandle;
 const osThreadAttr_t Motor_3_PWM_Dri_attributes = {
   .name = "Motor_3_PWM_Dri",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityAboveNormal4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for Servo_PWM */
+osThreadId_t Servo_PWMHandle;
+const osThreadAttr_t Servo_PWM_attributes = {
+  .name = "Servo_PWM",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for Motor_1_Velocity_Watch */
 osTimerId_t Motor_1_Velocity_WatchHandle;
@@ -128,16 +138,31 @@ void StartDefaultTask(void *argument);
 void Start_Motor_1_PWM(void *argument);
 void Start_Motor_2_PWM(void *argument);
 void Start_Motor_3_PWM(void *argument);
+void Start_Servo_PWM(void *argument);
 void Check_Motor_1_Velocity(void *argument);
 void Check_Motor_2_Velocity(void *argument);
 void Check_Motor_3_Velocity(void *argument);
 
+static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+int motor1State = 0;
+int motor2State = 0;
+int motor3State = 0;
+
+int m1TickCount = 0;
+int m2TickCount = 0;
+int m3TickCount = 0;
+
+int m1TickTarget = 0;
+int m2TickTarget = 0;
+int m3TickTarget = 0;
+
+int robMode = 0;
 /* USER CODE END 0 */
 
 /**
@@ -175,9 +200,12 @@ int main(void)
   MX_FSMC_Init();
   MX_I2S2_Init();
   MX_QUADSPI_Init();
- // MX_SDIO_SD_Init();
+  //MX_SDIO_SD_Init();
   MX_UART10_Init();
   MX_USART6_UART_Init();
+
+  /* Initialize interrupts */
+  MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -205,6 +233,15 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
+  if (Motor_3_Velocity_WatchHandle != NULL)
+  {
+    unsigned int timeDelay = 1000;
+    osStatus_t status = osTimerStart(Motor_3_Velocity_WatchHandle, timeDelay);
+    if (status != osOK)
+    {
+      int oo = 0;
+    }
+  }
   /* USER CODE END RTOS_TIMERS */
 
   /* USER CODE BEGIN RTOS_QUEUES */
@@ -223,6 +260,9 @@ int main(void)
 
   /* creation of Motor_3_PWM_Dri */
   Motor_3_PWM_DriHandle = osThreadNew(Start_Motor_3_PWM, NULL, &Motor_3_PWM_Dri_attributes);
+
+  /* creation of Servo_PWM */
+  Servo_PWMHandle = osThreadNew(Start_Servo_PWM, NULL, &Servo_PWM_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -309,6 +349,17 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief NVIC Configuration.
+  * @retval None
+  */
+static void MX_NVIC_Init(void)
+{
+  /* EXTI0_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 }
 
 /**
@@ -697,8 +748,8 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(M3_DIR_2_GPIO_Port, M3_DIR_2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, M3_PWM_Pin|LCD_CTP_RST_Pin|LCD_TE_Pin|WIFI_WKUP_Pin
-                          |M2_DIR_1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, M3_PWM_Pin|Servo_PWM_Pin|LCD_CTP_RST_Pin|LCD_TE_Pin
+                          |WIFI_WKUP_Pin|M2_DIR_1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOG, USB_OTG_FS_PWR_EN_Pin|M1_DIR_1_Pin, GPIO_PIN_RESET);
@@ -743,22 +794,14 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(M3_DIR_2_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : M3_PWM_Pin LCD_CTP_RST_Pin LCD_TE_Pin WIFI_WKUP_Pin
-                           M2_DIR_1_Pin */
-  GPIO_InitStruct.Pin = M3_PWM_Pin|LCD_CTP_RST_Pin|LCD_TE_Pin|WIFI_WKUP_Pin
-                          |M2_DIR_1_Pin;
+  /*Configure GPIO pins : M3_PWM_Pin Servo_PWM_Pin LCD_CTP_RST_Pin LCD_TE_Pin
+                           WIFI_WKUP_Pin M2_DIR_1_Pin */
+  GPIO_InitStruct.Pin = M3_PWM_Pin|Servo_PWM_Pin|LCD_CTP_RST_Pin|LCD_TE_Pin
+                          |WIFI_WKUP_Pin|M2_DIR_1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : ARD_D15_Pin */
-  GPIO_InitStruct.Pin = ARD_D15_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-  GPIO_InitStruct.Alternate = GPIO_AF4_I2C2;
-  HAL_GPIO_Init(ARD_D15_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : M3_ENC_2_Pin M3_ENC_1_Pin M2_ENC_2_Pin M2_ENC_1_Pin
                            M1_ENC_1_Pin */
@@ -883,11 +926,17 @@ static void MX_FSMC_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HandleEncoderUpdate(){
-  char* data = "ENCODER UPDATE\n";
-  
-  HAL_UART_Transmit(&huart6, (uint8_t * ) data, strlen(data), 10);
+void HandleEncoderUpdate()
+{
+  // currently sends message every time ANY encoder value updates.
+  // so ask all encoders to update thier values
+  //
+
+  ChalkBoi::getInstance().encoderTick();
 }
+int pathState = 0;
+int runState = 1;
+int line = 0;
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -902,10 +951,37 @@ void StartDefaultTask(void *argument)
   /* init code for USB_HOST */
   MX_USB_HOST_Init();
   /* USER CODE BEGIN 5 */
+  int current_state = 0;
+  PathData *data = new PathData(4);
+  //PathData aa;
   /* Infinite loop */
-  for(;;)
+  for (;;)
   {
     osDelay(1);
+
+
+    if ( current_state < data->path_state)
+    {
+      if (data->movement_type[current_state] == 0){
+        ChalkBoi::getInstance().getServo()->goToAngle(00);
+        osDelay(2500);
+        ChalkBoi::getInstance().setForward(0);}
+      else
+
+      {
+        ChalkBoi::getInstance().getServo()->goToAngle(180);
+        osDelay(2500);
+        ChalkBoi::getInstance().setTurn(Clockwise, 1);}
+
+      int c = ChalkBoi::getInstance().getEncoder2()->getCount();
+      if (c > data->movement_target[current_state] || c < -data->movement_target[current_state])
+      {
+        ChalkBoi::getInstance().stopPID1();
+        ChalkBoi::getInstance().stopPID2();
+        ChalkBoi::getInstance().stopPID3();
+        current_state++;
+      }
+    }
   }
   /* USER CODE END 5 */
 }
@@ -920,10 +996,15 @@ void StartDefaultTask(void *argument)
 void Start_Motor_1_PWM(void *argument)
 {
   /* USER CODE BEGIN Start_Motor_1_PWM */
+
   /* Infinite loop */
-  for(;;)
+  for (;;)
   {
-    ChalkBoi::getInstance().pwmPulse(1);
+    // ChalkBoi::getInstance().getPID1()->updateState();
+    // if (ChalkBoi::getInstance().getPID1()->getState() == PIDEnable)
+    ChalkBoi::getInstance().startPID1();
+    // else
+    //   ChalkBoi::getInstance().stopPID1();
   }
   /* USER CODE END Start_Motor_1_PWM */
 }
@@ -939,32 +1020,63 @@ void Start_Motor_2_PWM(void *argument)
 {
   /* USER CODE BEGIN Start_Motor_2_PWM */
   /* Infinite loop */
-  for(;;)
+  for (;;)
   {
-    
-    ChalkBoi::getInstance().pwmPulse(2);
-    //chalkey->pwmPulse(1);
+    //osDelay(1);
+    // ChalkBoi::getInstance().getPID2()->updateState();
+    // if (ChalkBoi::getInstance().getPID2()->getState() == PIDEnable)
+    ChalkBoi::getInstance().startPID2();
+    // else
+    //   ChalkBoi::getInstance().stopPID2();
   }
   /* USER CODE END Start_Motor_2_PWM */
 }
 
+/* USER CODE BEGIN Header_Start_Motor_3_PWM */
+/**
+* @brief Function implementing the Motor_3_PWM_Dri thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Start_Motor_3_PWM */
 void Start_Motor_3_PWM(void *argument)
 {
   /* USER CODE BEGIN Start_Motor_3_PWM */
   /* Infinite loop */
-  for(;;)
+  for (;;)
   {
-    
-    ChalkBoi::getInstance().pwmPulse(3);
-    //chalkey->pwmPulse(1);
+    //ChalkBoi::getInstance().updateMotor3State();
+    if (motor3State == 0)
+      ChalkBoi::getInstance().startPID3();
+    else
+      ChalkBoi::getInstance().stopPID3();
   }
   /* USER CODE END Start_Motor_3_PWM */
+}
+
+/* USER CODE BEGIN Header_Start_Servo_PWM */
+/**
+* @brief Function implementing the Servo_PWM thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Start_Servo_PWM */
+void Start_Servo_PWM(void *argument)
+{
+  /* USER CODE BEGIN Start_Servo_PWM */
+  /* Infinite loop */
+  for(;;)
+  {
+    ChalkBoi::getInstance().getServo()->pwmPulse();
+  }
+  /* USER CODE END Start_Servo_PWM */
 }
 
 /* Check_Motor_1_Velocity function */
 void Check_Motor_1_Velocity(void *argument)
 {
   /* USER CODE BEGIN Check_Motor_1_Velocity */
+  int b = 0;
   /* USER CODE END Check_Motor_1_Velocity */
 }
 
@@ -972,7 +1084,7 @@ void Check_Motor_1_Velocity(void *argument)
 void Check_Motor_2_Velocity(void *argument)
 {
   /* USER CODE BEGIN Check_Motor_2_Velocity */
-
+  int b = 0;
   /* USER CODE END Check_Motor_2_Velocity */
 }
 
@@ -980,7 +1092,11 @@ void Check_Motor_2_Velocity(void *argument)
 void Check_Motor_3_Velocity(void *argument)
 {
   /* USER CODE BEGIN Check_Motor_3_Velocity */
-
+  int aaa = ChalkBoi::getInstance().getEncoder1()->getCount();
+  char arr_buffer[8];
+  sprintf(arr_buffer, "%d\n", aaa);
+  //uint8_t *uint8_buffer = arr_buffer;
+  HAL_UART_Transmit(&huart6, (uint8_t *)arr_buffer, strlen(arr_buffer), 10);
   /* USER CODE END Check_Motor_3_Velocity */
 }
 

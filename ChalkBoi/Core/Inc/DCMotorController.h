@@ -11,6 +11,8 @@
 #include "cmsis_os.h"
 #include "main.h"
 
+
+enum MotorDirection {Clockwise, CounterClockwise};
 /*
  * DC Motor controller will provide a set of functions for interacting with a
  * motor via PWM signal sent through the output at (port,pin)
@@ -19,7 +21,7 @@ class DCMotorController
 {
 public:
 
-	enum MotorDirection {Clockwise, CounterClockwise};
+	
 	/*
 	 * IN - PORT is the port used to identify the signal pin that is driven high and low for pwm
 	 * IN - PIN is the pin used to identify the signal pin that is driven high and low for pwm

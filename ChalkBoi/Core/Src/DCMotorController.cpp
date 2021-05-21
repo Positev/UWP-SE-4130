@@ -1,7 +1,9 @@
 #include "DCMotorController.h"
-#include  "main.h"
+#include "main.h"
 
-DCMotorController::DCMotorController(GPIO_TypeDef* port, uint16_t pin, GPIO_TypeDef* dir1Port, uint16_t dir1Pin, GPIO_TypeDef* dir2Port, uint16_t dir2Pin){
+#include "cmsis_os.h"
+DCMotorController::DCMotorController(GPIO_TypeDef *port, uint16_t pin, GPIO_TypeDef *dir1Port, uint16_t dir1Pin, GPIO_TypeDef *dir2Port, uint16_t dir2Pin)
+{
   this->pwmPort = port;
   this->pwmPin = pin;
   this->dir1Port = dir1Port;
@@ -11,43 +13,66 @@ DCMotorController::DCMotorController(GPIO_TypeDef* port, uint16_t pin, GPIO_Type
 
   this->frequency = 20;
   this->power = 0;
-  this->direction = DCMotorController::Clockwise;
-} 
+  this->direction = Clockwise;
+}
 
-void DCMotorController::setPower(float power){
-  if (power > 1){
+void DCMotorController::setPower(float power)
+{
+  if (power > 1)
+  {
     this->power = 1;
   }
-  else if (power < 0){
+  else if (power < 0)
+  {
     this->power = 0;
   }
-  else{
+  else
+  {
     this->power = power;
   }
-  
 }
 
-void DCMotorController::pwmPulse(){
+void DCMotorController::pwmPulse()
+{
   float power = this->power;
-  HAL_GPIO_WritePin(this->pwmPort, this->pwmPin, GPIO_PIN_SET) ;
-  HAL_Delay(this->frequency * power);
-  
-  HAL_GPIO_WritePin(this->pwmPort, this->pwmPin, GPIO_PIN_RESET) ;
-  HAL_Delay(this->frequency * (1 - power));
+  GPIO_TypeDef *pwmPort = this->pwmPort;
+  uint16_t pwmPin = this->pwmPin;
+  int frequency = this->frequency;
+
+  HAL_GPIO_WritePin(pwmPort, pwmPin, GPIO_PIN_SET);
+  osDelay(frequency * power);
+
+  HAL_GPIO_WritePin(pwmPort, pwmPin, GPIO_PIN_RESET);
+  osDelay(frequency * (1 - power));
+}
+
+void DCMotorController::setDirection(MotorDirection direction)
+{
+  GPIO_TypeDef *dir1Port = this->dir1Port;
+  uint16_t dir1Pin = this->dir1Pin;
+  GPIO_TypeDef *dir2Port = this->dir2Port;
+  uint16_t dir2Pin = this->dir2Pin;
+
+  if (direction == Clockwise)
+  {
+    HAL_GPIO_WritePin(dir1Port, dir1Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(dir2Port, dir2Pin, GPIO_PIN_RESET);
   }
+  else if (direction == CounterClockwise)
+  {
 
-void DCMotorController::setDirection(MotorDirection direction){
-  if (direction == DCMotorController::Clockwise){
-      HAL_GPIO_WritePin(this->dir1Port, this->dir1Pin, GPIO_PIN_SET) ;
-      HAL_GPIO_WritePin(this->dir2Port, this->dir2Pin, GPIO_PIN_RESET) ;
-  }else if (direction == DCMotorController::CounterClockwise){
-
-      HAL_GPIO_WritePin(this->dir1Port, this->dir1Pin,GPIO_PIN_RESET ) ;
-      HAL_GPIO_WritePin(this->dir2Port, this->dir2Pin, GPIO_PIN_SET) ;
+    HAL_GPIO_WritePin(dir1Port, dir1Pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(dir2Port, dir2Pin, GPIO_PIN_SET);
   }
 }
 
-void DCMotorController::stop(){
-      HAL_GPIO_WritePin(this->dir1Port, this->dir1Pin, GPIO_PIN_RESET) ;
-      HAL_GPIO_WritePin(this->dir2Port, this->dir2Pin, GPIO_PIN_RESET) ;
+void DCMotorController::stop()
+{
+  GPIO_TypeDef *dir1Port = this->dir1Port;
+  uint16_t dir1Pin = this->dir1Pin;
+  GPIO_TypeDef *dir2Port = this->dir2Port;
+  uint16_t dir2Pin = this->dir2Pin;
+
+  HAL_GPIO_WritePin(dir1Port, dir1Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(dir2Port, dir2Pin, GPIO_PIN_RESET);
 }

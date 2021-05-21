@@ -1,9 +1,9 @@
 #ifndef SRC_CONTROLLERS_WHEELDRIVER_H_
 #define SRC_CONTROLLERS_WHEELDRIVER_H_
 
-#include "DCMotorController.h";
-#include "RoteryEncoderMonitor.h";
-#include "PIDDriver.h";
+#include "DCMotorController.h"
+#include "RoteryEncoderMonitor.h"
+#include "PIDDriver.h"
 
 enum DriveType {POWER, VELOCITY, DISPLACEMENT};
 
@@ -17,7 +17,7 @@ private:
 
     DCMotorController *motor;
     RoteryEncoderMonitor *encoder;
-    PIDDRIVER pid;
+    PIDDriver pid;
 
     
     float currentVelocity; // feet per second

@@ -85,8 +85,10 @@ Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c \
 CXXSOURCES= \
 Core/Src/main.cpp \
 Core/Src/ChalkBoi.cpp \
+Core/Src/PIDDriver.cpp \
 Core/Src/DCMotorController.cpp \
-Core/Src/RoteryEncoderMonitor.cpp 
+Core/Src/RoteryEncoderMonitor.cpp \
+Core/Src/ServoController.cpp \
 
 # Find header directories
 INCLUDES= \

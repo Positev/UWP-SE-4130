@@ -23,6 +23,7 @@
 #include "stm32f4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "ChalkBoi.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -60,7 +61,8 @@ extern HCD_HandleTypeDef hhcd_USB_OTG_FS;
 extern TIM_HandleTypeDef htim6;
 
 /* USER CODE BEGIN EV */
-
+extern ChalkBoi chalkBoiInstance;
+extern int robMode;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -162,6 +164,39 @@ void DebugMon_Handler(void)
 /******************************************************************************/
 
 /**
+  * @brief This function handles EXTI line0 interrupt.
+  */
+void EXTI0_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI0_IRQn 0 */
+  //int aa= ChalkBoi::getInstance().getEncoder2()->getCount();
+  //robMode = (robMode + 1) % 3;
+    ChalkBoi::getInstance().stopPID1();
+    ChalkBoi::getInstance().stopPID2();
+    ChalkBoi::getInstance().stopPID3();
+  // if (robMode == 0)
+  // {
+  //   ChalkBoi::getInstance().stopPID1();
+  //   ChalkBoi::getInstance().stopPID2();
+  //   ChalkBoi::getInstance().stopPID3();
+  // }
+  // else if (robMode == 1)
+  // {
+  //   ChalkBoi::getInstance().setTurn(MotorDirection::CounterClockwise, 9);
+  // }
+  // else
+  // {
+  //   ChalkBoi::getInstance().setForward(4);
+  // }
+
+  /* USER CODE END EXTI0_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
+  /* USER CODE BEGIN EXTI0_IRQn 1 */
+
+  /* USER CODE END EXTI0_IRQn 1 */
+}
+
+/**
   * @brief This function handles EXTI line4 interrupt.
   */
 void EXTI4_IRQHandler(void)
@@ -173,6 +208,7 @@ void EXTI4_IRQHandler(void)
   /* USER CODE BEGIN EXTI4_IRQn 1 */
 
   HandleEncoderUpdate();
+  // CallUpdate encoder method from Main.h
   /* USER CODE END EXTI4_IRQn 1 */
 }
 
@@ -189,6 +225,7 @@ void EXTI9_5_IRQHandler(void)
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
   /* USER CODE BEGIN EXTI9_5_IRQn 1 */
 
+  // CallUpdate encoder method from Main.h
   HandleEncoderUpdate();
   /* USER CODE END EXTI9_5_IRQn 1 */
 }

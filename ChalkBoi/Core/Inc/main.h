@@ -110,6 +110,7 @@ void HandleEncoderUpdate();
 #define CODEC_SD_GPIO_Port GPIOC
 #define B_USER_Pin GPIO_PIN_0
 #define B_USER_GPIO_Port GPIOA
+#define B_USER_EXTI_IRQn EXTI0_IRQn
 #define ARD_A1_Pin GPIO_PIN_1
 #define ARD_A1_GPIO_Port GPIOA
 #define ARD_A2_Pin GPIO_PIN_2
@@ -164,8 +165,8 @@ void HandleEncoderUpdate();
 #define LCD_PSRAM_D11_GPIO_Port GPIOE
 #define LCD_PSRAM_D12_Pin GPIO_PIN_15
 #define LCD_PSRAM_D12_GPIO_Port GPIOE
-#define ARD_D15_Pin GPIO_PIN_10
-#define ARD_D15_GPIO_Port GPIOB
+#define Servo_PWM_Pin GPIO_PIN_10
+#define Servo_PWM_GPIO_Port GPIOB
 #define M3_ENC_2_Pin GPIO_PIN_11
 #define M3_ENC_2_GPIO_Port GPIOB
 #define M3_ENC_2_EXTI_IRQn EXTI15_10_IRQn
